@@ -10,7 +10,7 @@ class Config:
     # SECRET_KEY = secrets.token_hex(75)
     # MAIL_SERVER = "smtp.gmail.com"
     # MAIL_PORT = 465
-    # MAIL_USE_TLS = True
+    # MAIL_USE_TLS = False
     # MAIL_USE_SSL = True
     # MAIL_USERNAME = 'fyndproject05@gmail.com'
     # MAIL_PASSWORD = 'Fyndpro@05'
@@ -31,7 +31,7 @@ class DevelopmentConfig(Config):
     SECRET_KEY = secrets.token_hex(75)
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 465
-    MAIL_USE_TLS = True
+    MAIL_USE_TLS = False
     MAIL_USE_SSL = True
     MAIL_USERNAME = 'fyndproject05@gmail.com'
     MAIL_PASSWORD = 'Fyndpro@05'

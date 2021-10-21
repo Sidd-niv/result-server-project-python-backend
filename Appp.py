@@ -1,13 +1,12 @@
-import os
 from flask import Flask, render_template, request, session
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
+import config1
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
-app.config['FLASK_ENV'] = 'development'
-app.config.from_object("Config.DevelopmentConfig")
+app.config.from_envvar()
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Sidd@localhost/fyndacademy'
 # app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # app.config['SECRET_KEY'] = os.urandom(50)
@@ -60,6 +59,7 @@ class Studinfo(db.Model):
 
 @app.route("/")
 def home():
+    print(app.config)
     return render_template("oppstudshaff.html")
 
 
