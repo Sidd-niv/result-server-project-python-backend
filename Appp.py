@@ -1,5 +1,5 @@
 import secrets
-from flask import Flask, render_template, request, session, flash
+from flask import Flask, render_template, request, session, flash, redirect
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
@@ -154,7 +154,8 @@ def otppg():
                 session.pop('response', None)
             return render_template("studD/email_re.html")
         else:
-            return render_template("studD/invalidstudotp.html")
+            flash('Please sign up before!')
+            return render_template("studD/Otppchek.html")
 
 
 if __name__ == "__main__":
