@@ -1,18 +1,13 @@
 import secrets
-from flask import Flask, render_template, request, session, flash, redirect
+from flask import Flask, render_template, request, session, flash, redirect, url_for
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
-from flask_login import UserMixin, LoginManager, current_user
-from flask_admin import Admin
 
 # from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
-login = LoginManager()
-login.init_app(app)
-# admin = Admin(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Sidd@localhost/fyndacademy'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SECRET_KEY'] = secrets.token_hex(75)
@@ -64,40 +59,39 @@ class Studinfo(db.Model):
                 "Stud_Result": self.Stud_Result}
 
 
-class Teacherlogin(db.Model, UserMixin):
-    id = db.Column(db.Integer(), primary_key=True)
+
+class Teacherlogin(db.Model):
+    Te_id = db.Column(db.Integer(), primary_key=True)
     teacher_name = db.Column(db.String(60), nullable=False)
     teacher_email = db.Column(db.String(80), unique=True, nullable=False)
     t_password = db.Column(db.String(60), unique=True, nullable=False)
 
-
-# admin.add_view(ModelView(Teacherlogin, db.session))
+    def js_log(self):
+        return {
+            "id": self.Te_id, "teacher_name": self.teacher_name,
+            "teacher_email": self.teacher_email,
+            "t_password": self.t_password
+        }
 
 
 @app.route("/")
 def home():
-    print(app.config)
     return render_template("oppstudshaff.html")
 
 
-@app.route("/studotplog")
-def studlogpa():
-    return render_template("studD/studentlg.html")
+@app.route("/studloginpg")
+def studloginpg():
+    return render_template("studD/newstudentlog.html")
 
 
-@app.route("/staffloog")
-def stafflogpa():
-    return render_template("staffD/Stafflogin.html")
+@app.route("/stafflogpg")
+def stafflogpg():
+    return render_template("staffD/newstafflo.html")
 
 
-@app.route("/inv_otp")
-def otp_re():
+@app.route("/invalidotppg")
+def invalidotppg():
     return render_template("studD/Otppchek.html")
-
-
-@login.user_loader
-def load_user(user_id):
-    return Teacherlogin.query.get(user_id)
 
 
 def gen_otp():
@@ -105,8 +99,8 @@ def gen_otp():
     return otP
 
 
-@app.route("/studinfo", methods=["GET", "POST"])
-def stud_info():
+@app.route("/studlogin", methods=["GET", "POST"])
+def studlogin():
     if request.method == "POST":
         studName = request.form.get("name")
         stdName1 = studName.split(" ")
@@ -115,7 +109,8 @@ def stud_info():
         try:
             stud = Studloginfo.Js_stud(Studloginfo.query.filter_by(stud_name=stdName2).first())
         except AttributeError:
-            return render_template("studD/invalstud.html")
+            flash("Invalid UserName or Email-ID")
+            return redirect(url_for('studloginpg'))
         if stud["stud_name"] == stdName2 and stud["stud_email"] == studEm:
             otp = gen_otp()
             msg = Message("OTP", recipients=[stud["stud_email"]])
@@ -154,8 +149,49 @@ def otppg():
                 session.pop('response', None)
             return render_template("studD/email_re.html")
         else:
-            flash('Please sign up before!')
-            return render_template("studD/Otppchek.html")
+            flash('Please enter a valid OTP')
+            return redirect(url_for('invalidotppg'))
+
+
+@app.route("/stafflogin", methods=["GET", "POST"])
+def stafflogin():
+    if request.method == 'POST':
+        staff_user_name = request.form.get("stafname")
+        staff_user_pass = request.form.get("pwds")
+        if "user_id" in session:
+            session.pop("user_id", None)
+        try:
+            staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_user_name).first())
+        except AttributeError:
+            flash("Invalid UserName or Password")
+            return redirect(url_for('stafflogpg'))
+        if staff_info["teacher_name"] == staff_user_name and staff_info["t_password"] == staff_user_pass:
+            session["user_id"] = staff_info["teacher_name"]
+            return redirect(url_for("resultpg"))
+        else:
+            flash("Invalid Username or Password")
+            return redirect(url_for('stafflogpg'))
+    else:
+        return render_template("newstafflog.html")
+
+@app.route("/resultpg")
+def resultpg():
+    if "user_id" in session:
+        return render_template("StaffD/reind.html")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
+
+@app.route('/logout')
+def stafflogout():
+    if "user_id" in session:
+        session.pop("user_id", None)
+    return render_template("staffD/newstafflo.html")
+
+
+
+
+
 
 
 if __name__ == "__main__":

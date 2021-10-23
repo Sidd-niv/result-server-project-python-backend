@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>student</title>
-</head>
+{% extends "studD/base2.html" %}
+{% block head %}
+<title>Staff Login</title>
+{% endblock %}
+{% block content %}
 <body style="background-color:powderblue;">
 <hr color="red">
 <h1>Please provide your institute details to view your result</h1>
-<form action="/studlogin1" method="post">
+<form action="/studlogin" method="post">
     <hr color="red">
     <div>
         <label>Student Name</label>
@@ -22,6 +21,13 @@
   <button type="submit" style="border: 2px solid Tomato;"> Send OTP</button>
     <hr color="red">
 </form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+<!--        {% for message in messages %}-->
+            {{ message }}
 
+<!--        {% endfor %}-->
+    {% endif %}
+{% endwith %}
 </body>
-</html>
+{% endblock %}

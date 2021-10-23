@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Verification</title>
-</head>
-<body>
+{% extends "studD/base2.html" %}
+{% block head %}
+<title>Verification</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
 <h1>Please enter Your OTP to view your result</h1>
 <form action="/Otpstud" method="post">
   <label>Enter OTP
@@ -12,5 +11,38 @@
   </label><br>
   <button type="submit">Submit</button>
 </form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div>
+<a href="{{ url_for('studloginpg')}}" ><button style="border: 2px solid DodgerBlue;">Resend OTP</button></a>
+</div>
 </body>
-</html>
+{% endblock %}
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Verification</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Please enter Your OTP to view your result</h1>-->
+<!--<form action="/Otpstud" method="post">-->
+<!--  <label>Enter OTP-->
+<!--    <input type="text" name="otp" maxlength="4" required>-->
+<!--  </label><br>-->
+<!--  <button type="submit">Submit</button>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->

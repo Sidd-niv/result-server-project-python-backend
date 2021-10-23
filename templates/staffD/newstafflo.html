@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Staff Login</title>
-</head>
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Staff Login</title>
+{% endblock %}
+{% block content %}
 <body style="background-color:powderblue;">
-<form action="/stafflog" method="post">
+<form action="/stafflogin" method="post">
     <Hr color="white">
     <h1>Please enter your detail to login</h1>
     <Hr color="white">
@@ -19,6 +18,12 @@
     <button type="submit" style="border: 2px solid Tomato;">Login</button>
     <hr color="white">
 </form>
-
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 </body>
-</html>
+{% endblock %}
