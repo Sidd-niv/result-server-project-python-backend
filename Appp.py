@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, session, flash, redirect, url
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
+from mail_pdff_den import *
+
 
 # from flask_admin.contrib.sqla import ModelView
 
@@ -23,6 +25,7 @@ app.config['MAIL_SUPPRESS_SEND'] = False
 app.config['MAIL_ASCII_ATTACHMENTS'] = False
 mail = Mail()
 mail.init_app(app)
+m_pdf = FPDF()
 
 
 class Studloginfo(db.Model):
@@ -57,7 +60,6 @@ class Studinfo(db.Model):
                 "Paper_4": self.Paper_4, "Paper_5": self.Paper_5,
                 "Overall_Percentage": self.Overall_Percentage,
                 "Stud_Result": self.Stud_Result}
-
 
 
 class Teacherlogin(db.Model):
@@ -99,6 +101,12 @@ def gen_otp():
     return otP
 
 
+def make_pdf(ip):
+    m_pdf.add_page()
+    m_pdf.set_font(family="Times New Roman", size=16)
+    m_pdf.cell()
+
+
 @app.route("/studlogin", methods=["GET", "POST"])
 def studlogin():
     if request.method == "POST":
@@ -106,6 +114,8 @@ def studlogin():
         stdName1 = studName.split(" ")
         stdName2 = " ".join([i.capitalize() for i in stdName1])
         studEm = request.form.get("email")
+        if 'response' in session:
+            session.pop('response', None)
         try:
             stud = Studloginfo.Js_stud(Studloginfo.query.filter_by(stud_name=stdName2).first())
         except AttributeError:
@@ -133,17 +143,32 @@ def otppg():
             otp_email = session['response']["email"]
         if otp == studOTp:
             res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
-            final_mail_msg = f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}\n" \
-                             f"Paper-1 Marks: {res_email['Paper_1']}\n" \
-                             f"Paper-2 Marks: {res_email['Paper_2']}\n" \
-                             f"Paper-3 Marks: {res_email['Paper_3']}\n" \
-                             f"Paper-4 Marks: {res_email['Paper_4']}\n" \
-                             f"Paper-5 Marks: {res_email['Paper_5']}\n" \
-                             f"Percentage: {res_email['Overall_Percentage']}\n" \
-                             f"---------------------------------------\n" \
-                             f"Result: {res_email['Stud_Result']}"
+            msg_li = [
+                f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}",
+                f"Paper-1 Marks: {res_email['Paper_1']}",
+                f"Paper-2 Marks: {res_email['Paper_2']}",
+                f"Paper-3 Marks: {res_email['Paper_3']}",
+                f"Paper-4 Marks: {res_email['Paper_4']}",
+                f"Paper-5 Marks: {res_email['Paper_5']}",
+                f"Percentage: {res_email['Overall_Percentage']}",
+                f"---------------------------------------",
+                f"Result: {res_email['Stud_Result']}"
+                ]
+            pdf = PDF(orientation="P", format="A4")
+            pdf.add_page()  # it will add a page
+            pdf.set_line_width(0.0)
+            pdf.line(5.0, 5.0, 205.0, 5.0)  # top one
+            pdf.line(5.0, 292.0, 205.0, 292.0)  # bottom one
+            pdf.line(5.0, 5.0, 5.0, 292.0)  # left one
+            pdf.line(205.0, 5.0, 205.0, 292.0)  # right one
+            pdf.set_font(family="times", size=16)
+            for line in msg_li:
+                pdf.cell(0, 10, txt=line, ln=True)
+            pdf.output('FYND-Result.pdf', 'F')
             msg = Message("FYND SEM-1 Result", recipients=[otp_email])
-            msg.body = final_mail_msg
+            msg.body = f"{res_email['Name']} your sem:{res_email['Sem_1']} result"
+            with app.open_resource('FYND-Result.pdf') as fp:
+                msg.attach('FYND SEM-1 Result', "application/pdf", fp.read())
             mail.send(msg)
             if 'response' in session:
                 session.pop('response', None)
@@ -174,6 +199,7 @@ def stafflogin():
     else:
         return render_template("newstafflog.html")
 
+
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
@@ -182,6 +208,7 @@ def resultpg():
         flash("Please login")
         return redirect("stafflogpg")
 
+
 @app.route('/logout')
 def stafflogout():
     if "user_id" in session:
@@ -189,10 +216,15 @@ def stafflogout():
     return render_template("staffD/newstafflo.html")
 
 
-
-
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
+
+# final_mail_msg = f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}<br>\n" \
+#                              f"Paper-1 Marks: {res_email['Paper_1']}<br>\n" \
+#                              f"Paper-2 Marks: {res_email['Paper_2']}<br>\n" \
+#                              f"Paper-3 Marks: {res_email['Paper_3']}<br>\n" \
+#                              f"Paper-4 Marks: {res_email['Paper_4']}<br>\n" \
+#                              f"Paper-5 Marks: {res_email['Paper_5']}<br>\n" \
+#                              f"Percentage: {res_email['Overall_Percentage']}<br>\n" \
+#                              f"---------------------------------------<br>\n" \
+#                              f"Result: {res_email['Stud_Result']}"
