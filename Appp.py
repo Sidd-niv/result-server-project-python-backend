@@ -1,12 +1,10 @@
 import secrets
+import os
 from flask import Flask, render_template, request, session, flash, redirect, url_for
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
-
-
-# from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -41,7 +39,7 @@ class Studinfo(db.Model):
     stud_id = db.Column(db.Integer(), primary_key=True)
     Name = db.Column(db.String(60), unique=False, nullable=False)
     Gender = db.Column(db.String(45), unique=False, nullable=False)
-    Sem_1 = db.Column(db.Integer(), unique=False, nullable=False)
+    Sem = db.Column(db.Integer(), unique=False, nullable=False)
     Roll_no = db.Column(db.Integer(), unique=False, nullable=False)
     Div = db.Column(db.String(10), unique=False, nullable=False)
     Paper_1 = db.Column(db.String(45), unique=False, nullable=False)
@@ -54,12 +52,15 @@ class Studinfo(db.Model):
 
     def js_re(self):
         return {"stud_id": self.stud_id, "Name": self.Name, "Gender": self.Gender,
-                "Sem_1": self.Sem_1, "Roll_no": self.Roll_no,
+                "Sem_1": self.Sem, "Roll_no": self.Roll_no,
                 "Div": self.Div, "Paper_1": self.Paper_1,
                 "Paper_2": self.Paper_2, "Paper_3": self.Paper_3,
                 "Paper_4": self.Paper_4, "Paper_5": self.Paper_5,
                 "Overall_Percentage": self.Overall_Percentage,
                 "Stud_Result": self.Stud_Result}
+
+    def js_st_id(self):
+        return {"stud_if": self.stud_id}
 
 
 class Teacherlogin(db.Model):
@@ -73,6 +74,19 @@ class Teacherlogin(db.Model):
             "id": self.Te_id, "teacher_name": self.teacher_name,
             "teacher_email": self.teacher_email,
             "t_password": self.t_password
+        }
+
+
+class Admininfo(db.Model):
+    admin_name = db.Column(db.String(60), primary_key=True)
+    admin_email = db.Column(db.String(80), unique=True, nullable=False)
+    admin_pass = db.Column(db.String(60), unique=True, nullable=False)
+
+    def js_add(self):
+        return {
+            "AdminD": self.admin_name,
+            "Email": self.admin_email,
+            "Password": self.admin_pass
         }
 
 
@@ -91,6 +105,11 @@ def stafflogpg():
     return render_template("staffD/newstafflo.html")
 
 
+@app.route("/Adminlogpg")
+def Adminlogpg():
+    return render_template("staffD/Adminlog.html")
+
+
 @app.route("/invalidotppg")
 def invalidotppg():
     return render_template("studD/Otppchek.html")
@@ -101,21 +120,15 @@ def gen_otp():
     return otP
 
 
-def make_pdf(ip):
-    m_pdf.add_page()
-    m_pdf.set_font(family="Times New Roman", size=16)
-    m_pdf.cell()
-
-
 @app.route("/studlogin", methods=["GET", "POST"])
 def studlogin():
+    if 'response' in session:
+        session.pop('response', None)
     if request.method == "POST":
         studName = request.form.get("name")
         stdName1 = studName.split(" ")
         stdName2 = " ".join([i.capitalize() for i in stdName1])
         studEm = request.form.get("email")
-        if 'response' in session:
-            session.pop('response', None)
         try:
             stud = Studloginfo.Js_stud(Studloginfo.query.filter_by(stud_name=stdName2).first())
         except AttributeError:
@@ -134,7 +147,7 @@ def studlogin():
 
 @app.route("/Otpstud", methods=["GET", "POST"])
 def otppg():
-    global otp, otp_name, otp_email
+    global otp_email, otp, otp_name
     if request.method == "POST":
         studOTp = request.form.get("otp")
         if 'response' in session:
@@ -153,7 +166,7 @@ def otppg():
                 f"Percentage: {res_email['Overall_Percentage']}",
                 f"---------------------------------------",
                 f"Result: {res_email['Stud_Result']}"
-                ]
+            ]
             pdf = PDF(orientation="P", format="A4")
             pdf.add_page()  # it will add a page
             pdf.set_line_width(0.0)
@@ -168,10 +181,12 @@ def otppg():
             msg = Message("FYND SEM-1 Result", recipients=[otp_email])
             msg.body = f"{res_email['Name']} your sem:{res_email['Sem_1']} result"
             with app.open_resource('FYND-Result.pdf') as fp:
-                msg.attach('FYND SEM-1 Result', "application/pdf", fp.read())
+                msg.attach('FYND-result.pdf', "application/pdf", fp.read())
             mail.send(msg)
             if 'response' in session:
                 session.pop('response', None)
+            if os.path.exists("FYND-Result.pdf"):
+                os.remove("FYND-Result.pdf")
             return render_template("studD/email_re.html")
         else:
             flash('Please enter a valid OTP')
@@ -180,13 +195,13 @@ def otppg():
 
 @app.route("/stafflogin", methods=["GET", "POST"])
 def stafflogin():
+    if "user_id" in session:
+        session.pop("user_id", None)
     if request.method == 'POST':
         staff_user_name = request.form.get("stafname")
         staff_user_pass = request.form.get("pwds")
-        if "user_id" in session:
-            session.pop("user_id", None)
         try:
-            staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_user_name).first())
+            staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(admin_name=staff_user_name).first())
         except AttributeError:
             flash("Invalid UserName or Password")
             return redirect(url_for('stafflogpg'))
@@ -216,15 +231,62 @@ def stafflogout():
     return render_template("staffD/newstafflo.html")
 
 
+@app.route("/adminlogin", methods=["GET", "POST"])
+def adminlogin():
+    if request.method == 'POST':
+        if "user_id2" in session:
+            session.pop("user_id2", None)
+        add_user_name = request.form.get("addname")
+        add_user_pass = request.form.get("addpwds")
+        if "user_id2" in session:
+            session.pop("user_id2", None)
+        try:
+            admin_info = Admininfo.js_add(Admininfo.query.filter_by(admin_name=add_user_name).first())
+        except AttributeError:
+            flash("Invalid UserName or Password")
+            return redirect(url_for('Adminlogpg'))
+        if admin_info["AdminD"] == add_user_name and admin_info["Password"] == add_user_pass:
+            session["user_id2"] = admin_info["AdminD"]
+            return redirect(url_for('adminres'))
+        else:
+            flash("Invalid Username or Password")
+            return redirect(url_for('stafflogpg'))
+    else:
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route("/adminres")
+def adminres():
+    if "user_id2" in session:
+        return render_template("staffD/adminpro.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route('/adminlogout')
+def adminlogout():
+    if "user_id2" in session:
+        session.pop("user_id2", None)
+    return render_template("staffD/Adminlog.html")
+
+
+@app.route("/addstudinfoo", methods=['GET', 'POST'])
+def addstudinfoo():
+    if request.method == 'POST':
+        stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
+        new_stud_id = len(stud_id_list) + 1
+        new_stud_name = request.form.get('studname')
+        new_stud_gen = request.form.get('gen')
+        new_stud_sem = request.form.get('sem')
+    #     entry = Manageinfo(TagID=TagID, Car_name=Car_name, Color=Color, Price=Price)
+    #     db.session.add(entry)
+    #     db.session.commit()
+    # return render_template("addinfo.html"
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
-# final_mail_msg = f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}<br>\n" \
-#                              f"Paper-1 Marks: {res_email['Paper_1']}<br>\n" \
-#                              f"Paper-2 Marks: {res_email['Paper_2']}<br>\n" \
-#                              f"Paper-3 Marks: {res_email['Paper_3']}<br>\n" \
-#                              f"Paper-4 Marks: {res_email['Paper_4']}<br>\n" \
-#                              f"Paper-5 Marks: {res_email['Paper_5']}<br>\n" \
-#                              f"Percentage: {res_email['Overall_Percentage']}<br>\n" \
-#                              f"---------------------------------------<br>\n" \
-#                              f"Result: {res_email['Stud_Result']}"
+# Siddhant Niv
+# sidd2341

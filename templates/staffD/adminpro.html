@@ -1,0 +1,20 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Admin result</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+            {{ message }}
+    {% endif %}
+{% endwith %}
+<h1> welcome to admin</h1>
+<form action="/adminlogout" method="get">
+    <button type="submit" name="logout" value="logout">logout</button>
+</form>
+<form action="/adminlogout" method="get">
+    <button type="submit" name="logout" value="logout">logout</button>
+</form>
+</body>
+{% endblock %}

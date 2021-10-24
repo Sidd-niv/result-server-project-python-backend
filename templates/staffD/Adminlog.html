@@ -4,15 +4,15 @@
 {% endblock %}
 {% block content %}
 <body style="background-color:powderblue;">
-<form action="/stafflogin" method="post">
+<form action="/adminlogin" method="post">
     <Hr color="white">
-    <h1>Please enter your detail to login</h1>
+    <h1>Please enter your Admin detail to login</h1>
     <Hr color="white">
-    <label>User Name:
-    <input type="text" name="stafname" required>
+    <label>Admin User Name:
+    <input type="text" name="addname" required>
     </label><br>
-    <label>User Password:
-        <input type="password" name="pwds">
+    <label>Admin Password:
+        <input type="password" name="addpwds">
     </label><br>
     <Hr color="white">
     <button type="submit" style="border: 2px solid Tomato;">Login</button>

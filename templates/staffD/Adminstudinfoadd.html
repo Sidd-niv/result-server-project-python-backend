@@ -1,0 +1,57 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Add student info</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+<form action="/addstudinfoo" method="post">
+    <label>Name of student
+    <input type="text" name="studname" required>
+</label><br>
+<label>Gender
+    <input type="text" name="gen" required>
+</label><br>
+<label>Semester
+    <input type="text" name="sem" required>
+</label><br>
+<label>Student Roll no
+    <input type="text" name="rollno" required>
+</label><br>
+<label>Student Division
+    <input type="text" name="div" required>
+</label><br>
+<label>Paper-1 Marks
+    <input type="text" name="p1" required>
+</label><br>
+<label>Paper-2 Marks
+    <input type="text" name="p2" required>
+</label><br>
+<label>Paper-3 Marks
+    <input type="text" name="p3" required>
+</label><br>
+<label>Paper-4 Marks
+    <input type="text" name="p4" required>
+</label><br>
+<label>Paper-5 Marks
+    <input type="text" name="p5" required>
+</label><br>
+<label>Percentage
+    <input type="text" name="ptg" required>
+</label><br>
+<label>Result
+    <input type="text" name="stre" required>
+</label><br>
+</form>
+<hr color="Orange">
+  <button type="reset" style="border: 2px solid DodgerBlue;" >Reset</button><br>
+  <button type="submit" style="border: 2px solid Tomato;">Add student information</button><br>
+<hr color="Orange">
+</body>
+{% endblock %}
+
+
+<!--{% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--            {{ message }}-->
+<!--    {% endif %}-->
+<!--{% endwith %}-->
