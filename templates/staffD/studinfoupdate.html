@@ -1,0 +1,105 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Update</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+<h1>Update Student marks</h1>
+<form action="/updateinfo" method="post">
+    <label>Enter old name of student
+        <input type="text" name="olname" required>
+    </label><br>
+    <label>Enter new name of student
+        <input type="text" name="nename" required>
+    </label><br>
+    <button type="submit">update Name</button>
+</form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<!--<form action="/updateinfo" method="get">-->
+<!--    <label>Enter Student Name-->
+<!--        <input type="text" name="p1name" required>-->
+<!--    </label><br>-->
+<!--    <label>Paper-1 Marks-->
+<!--    <input type="text" name="p1" required>-->
+<!--    </label><br>-->
+<!--    <button type="submit" name="p_1" value="p_1" >update Paper-1 Marks</button>-->
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--        {% for message in messages %}-->
+<!--            {{ message }}-->
+<!--        {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+<!--</form>-->
+<!--<form action="/updateinfo" method="get">-->
+<!--    <label>Enter Student Name-->
+<!--        <input type="text" name="p2name" required>-->
+<!--    </label><br>-->
+<!--    <label>Paper-2 Marks-->
+<!--    <input type="text" name="p2" required>-->
+<!--    </label><br>-->
+<!--    <button type="submit" name="p_2" value="p_2" >update Paper-2 Marks</button>-->
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--        {% for message in messages %}-->
+<!--            {{ message }}-->
+<!--        {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+<!--</form>-->
+<!--<form action="/updateinfo" method="get">-->
+<!--    <label>Enter Student Name-->
+<!--        <input type="text" name="p3name" required>-->
+<!--    </label><br>-->
+<!--    <label>Paper-3 Marks-->
+<!--    <input type="text" name="p3" required>-->
+<!--    </label><br>-->
+<!--    <button type="submit" name="p_3" value="p_3" >update Paper-3 Marks</button>-->
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--        {% for message in messages %}-->
+<!--            {{ message }}-->
+<!--        {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+<!--</form>-->
+<!--<form action="/updateinfo" method="get">-->
+<!--    <label>Enter Student Name-->
+<!--        <input type="text" name="p4name" required>-->
+<!--    </label><br>-->
+<!--    <label>Paper-4 Marks-->
+<!--    <input type="text" name="p4" required>-->
+<!--    </label><br>-->
+<!--    <button type="submit" name="p_4" value="p_4">update Paper-4 Marks</button>-->
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--        {% for message in messages %}-->
+<!--            {{ message }}-->
+<!--        {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+<!--</form>-->
+<!--<form action="/updateinfo" method="get">-->
+<!--    <label>Enter Student Name-->
+<!--        <input type="text" name="p5name" required>-->
+<!--    </label><br>-->
+<!--    <label>Paper-5 Marks-->
+<!--    <input type="text" name="p5" required>-->
+<!--    </label><br>-->
+<!--    <button type="submit" name="p_5" value="p_5">update Paper-5 Marks</button>-->
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--        {% for message in messages %}-->
+<!--            {{ message }}-->
+<!--        {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+<!--</form>-->
+</body>
+{% endblock %}

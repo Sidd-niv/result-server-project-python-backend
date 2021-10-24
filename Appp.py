@@ -304,6 +304,29 @@ def addstudinfoo():
         return render_template("staffD/Adminlog.html")
 
 
+@app.route("/updateinfo", methods=["GET", "POST"])
+def updateinfo():
+    if "user_id2" in session:
+        if request.method == "POST":
+            old_name = request.form.get("olname")
+            print(old_name)
+            new_name = request.form.get("nename")
+            try:
+                update_name = Studinfo.query.get(Name=old_name).first()
+            except AttributeError:
+                flash("Invalid Student Name")
+                return redirect(url_for('updateinfo'))
+            print(update_name)
+            update_name.Name = new_name
+            db.session.commit()
+            return redirect(url_for('updateinfo'))
+        return render_template("staffD/studinfoupdate.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+
 @app.route('/adminlogout')
 def adminlogout():
     if "user_id2" in session:
@@ -314,4 +337,59 @@ def adminlogout():
 if __name__ == "__main__":
     app.run(debug=True)
 
-
+# if request.form.get("p_1") == "p_1":
+#     name = request.form.get('p1name')
+#     paper_01 = request.form.get('p1')
+#     try:
+#         update_reso = Studinfo.query.filter_by(Name=name).first()
+#     except AttributeError:
+#         flash("Invalid Student Name")
+#         return redirect(url_for('updateinfo'))
+#     update_reso.Paper_1 = paper_01
+#     db.session.commit()
+#     return redirect(url_for('updateinfo'))
+# if request.form.get("p_2") == "p_2":
+#     name = request.form.get('p2name')
+#     paper_02 = request.form.get('p2')
+#     try:
+#         update_reso = Studinfo.query.filter_by(Name=name).first()
+#     except AttributeError:
+#         flash("Invalid Student Name")
+#         return redirect(url_for('updateinfo'))
+#     update_reso.Paper_2 = paper_02
+#     db.session.commit()
+#     return redirect(url_for('updateinfo'))
+# if request.form.get("p_3") == "p_3":
+#     name = request.form.get('p3name')
+#     paper_03 = request.form.get('p3')
+#     try:
+#         update_reso = Studinfo.query.filter_by(Name=name).first()
+#     except AttributeError:
+#         flash("Invalid Student Name")
+#         return redirect(url_for('updateinfo'))
+#     update_reso.Paper_3 = paper_03
+#     db.session.commit()
+#     return redirect(url_for('updateinfo'))
+# if request.form.get("p_4") == "p_4":
+#     name = request.form.get('p4name')
+#     paper_04 = request.form.get('p4')
+#     try:
+#         update_reso = Studinfo.query.filter_by(Name=name).first()
+#     except AttributeError:
+#         flash("Invalid Student Name")
+#         return redirect(url_for('updateinfo'))
+#     update_reso.Paper_4 = paper_04
+#     db.session.commit()
+#     return redirect(url_for('updateinfo'))
+# if request.form.get("p_5") == "p_5":
+#     name = request.form.get('p5name')
+#     paper_05 = request.form.get('p5')
+#     try:
+#         update_reso = Studinfo.query.filter_by(Name=name).first()
+#     except AttributeError:
+#         flash("Invalid Student Name")
+#         return redirect(url_for('updateinfo'))
+#     update_reso.Paper_5 = paper_05
+#     db.session.commit()
+#     return redirect(url_for('updateinfo'))
+# return render_template("staffD/studinfoupdate.html")
