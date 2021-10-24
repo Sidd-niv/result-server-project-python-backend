@@ -9,7 +9,7 @@
     <input type="text" name="studname" required>
 </label><br>
 <label>Gender
-    <input type="text" name="gen" required>
+    <input type="text" name="gen" placeholder="for Male=1 or Female=0" required>
 </label><br>
 <label>Semester
     <input type="text" name="sem" required>
@@ -41,17 +41,18 @@
 <label>Result
     <input type="text" name="stre" required>
 </label><br>
-</form>
 <hr color="Orange">
   <button type="reset" style="border: 2px solid DodgerBlue;" >Reset</button><br>
   <button type="submit" style="border: 2px solid Tomato;">Add student information</button><br>
 <hr color="Orange">
+</form>
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+{% endwith %}
 </body>
 {% endblock %}
 
 
-<!--{% with messages = get_flashed_messages() %}-->
-<!--    {% if messages %}-->
-<!--            {{ message }}-->
-<!--    {% endif %}-->
-<!--{% endwith %}-->
+

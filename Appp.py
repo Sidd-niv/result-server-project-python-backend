@@ -62,6 +62,9 @@ class Studinfo(db.Model):
     def js_st_id(self):
         return {"stud_if": self.stud_id}
 
+    def js_st_name(self):
+        return {"Name": self.Name}
+
 
 class Teacherlogin(db.Model):
     Te_id = db.Column(db.Integer(), primary_key=True)
@@ -233,13 +236,11 @@ def stafflogout():
 
 @app.route("/adminlogin", methods=["GET", "POST"])
 def adminlogin():
+    if "user_id2" in session:
+        session.pop("user_id2", None)
     if request.method == 'POST':
-        if "user_id2" in session:
-            session.pop("user_id2", None)
         add_user_name = request.form.get("addname")
         add_user_pass = request.form.get("addpwds")
-        if "user_id2" in session:
-            session.pop("user_id2", None)
         try:
             admin_info = Admininfo.js_add(Admininfo.query.filter_by(admin_name=add_user_name).first())
         except AttributeError:
@@ -250,7 +251,7 @@ def adminlogin():
             return redirect(url_for('adminres'))
         else:
             flash("Invalid Username or Password")
-            return redirect(url_for('stafflogpg'))
+            return redirect(url_for('Adminlogpg'))
     else:
         return render_template("staffD/Adminlog.html")
 
@@ -264,6 +265,45 @@ def adminres():
         return render_template("staffD/Adminlog.html")
 
 
+@app.route("/addstudinfoo", methods=['GET', 'POST'])
+def addstudinfoo():
+    if "user_id2" in session:
+        if request.method == 'POST':
+            stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
+            new_stud_id = len(stud_id_list) + 1
+            new_stud_name = request.form.get('studname')
+            new_stud_name1 = new_stud_name.split(" ")
+            new_stud_name2 = " ".join([i.capitalize() for i in new_stud_name1])
+            new_stud_gen = request.form.get('gen')
+            new_stud_sem = request.form.get('sem')
+            new_stud_roll = request.form.get('rollno')
+            new_stud_div = request.form.get('div')
+            new_stud_p1 = request.form.get('p1')
+            new_stud_p2 = request.form.get('p2')
+            new_stud_p3 = request.form.get('p3')
+            new_stud_p4 = request.form.get('p4')
+            new_stud_p5 = request.form.get('p5')
+            new_stud_percen = request.form.get('ptg')
+            new_stud_result = request.form.get('stre')
+            old_stud_name = [Studinfo.js_st_name(a) for a in Studinfo.query.all()]
+            if {"Name": new_stud_name2} in old_stud_name:
+                flash(f"{new_stud_name2} data already exists")
+                return render_template("staffD/Adminstudinfoadd.html")
+            entry = Studinfo(stud_id=new_stud_id, Name=new_stud_name2,
+                             Gender=new_stud_gen, Sem=new_stud_sem,
+                             Roll_no=new_stud_roll, Div=new_stud_div,
+                             Paper_1=new_stud_p1, Paper_2=new_stud_p2,
+                             Paper_3=new_stud_p3, Paper_4=new_stud_p4,
+                             Paper_5=new_stud_p5, Overall_Percentage=new_stud_percen,
+                             Stud_Result=new_stud_result)
+            db.session.add(entry)
+            db.session.commit()
+        return render_template("staffD/Adminstudinfoadd.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
 @app.route('/adminlogout')
 def adminlogout():
     if "user_id2" in session:
@@ -271,22 +311,7 @@ def adminlogout():
     return render_template("staffD/Adminlog.html")
 
 
-@app.route("/addstudinfoo", methods=['GET', 'POST'])
-def addstudinfoo():
-    if request.method == 'POST':
-        stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
-        new_stud_id = len(stud_id_list) + 1
-        new_stud_name = request.form.get('studname')
-        new_stud_gen = request.form.get('gen')
-        new_stud_sem = request.form.get('sem')
-    #     entry = Manageinfo(TagID=TagID, Car_name=Car_name, Color=Color, Price=Price)
-    #     db.session.add(entry)
-    #     db.session.commit()
-    # return render_template("addinfo.html"
-
-
 if __name__ == "__main__":
     app.run(debug=True)
 
-# Siddhant Niv
-# sidd2341
+
