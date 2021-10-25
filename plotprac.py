@@ -62,17 +62,17 @@ import rsa
 #     plt.title("Percentage Graph")
 #     plt.xlabel("Students")
 #     plt.ylabel("Percentage")
-#     plt.savefig("Paper-1.png")
+#     plt.savefig("Paper-1.jpg")
 #
 # Bar_plot()
 
-publickey, privatekey = rsa.newkeys(512)
-otp = "1234"
-
-en_message = rsa.encrypt(otp.encode(), publickey)
-print(en_message)
-de_message = rsa.decrypt(en_message, privatekey).decode()
-print(de_message)
+# publickey, privatekey = rsa.newkeys(512)
+# otp = "1234"
+#
+# en_message = rsa.encrypt(otp.encode(), publickey)
+# print(en_message)
+# de_message = rsa.decrypt(en_message, privatekey).decode()
+# print(de_message)
 
 
 

@@ -1,11 +1,14 @@
 import secrets
 import os
 import re
-from flask import Flask, render_template, request, session, flash, redirect, url_for, Response
+import io
+from flask import Flask, render_template, request, session, flash, redirect, url_for, Response, send_file
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
+from matplotlib.ticker import PercentFormatter
+from matplotlib.backends.backend_agg import FigureCanvasAgg as figureCanvas
 import matplotlib.pyplot as plt
 import rsa
 
@@ -240,26 +243,23 @@ def stafflogin():
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
-        data_name_set1 = [Studinfo.js_name(a) for a in Studinfo.query.all()]
-        data_set_name = []
-        for i in range(len(data_name_set1)):
-            data_set_name.append(data_name_set1[i]["Name"])
-        data_p1_set = [Studinfo.js_p1(a) for a in Studinfo.query.all()]
-        data_set_p1_list = []
-        datasetp_1 = []
-        for i in range(len(data_p1_set)):
-            data_set_p1_list.append(data_p1_set[i]["Paper-1"])
-        for j in range(len(data_set_p1_list)):
-            datasetp_1.append(int(data_set_p1_list[j][0:2]))
-        left_edges = datasetp_1
-        height = data_set_name
-        plt.bar(left_edges, height)
-        plt.title("Percentage Graph")
-        plt.xlabel("Students")
-        plt.ylabel("Percentage")
-        plt.savefig("ImagePaper-1.jpg", bbox_inches="tight")
+        name_data_set = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
+        paperp1_data_set = [Studinfo.js_p1(a)["Paper-1"][0:2] for a in Studinfo.query.all()]
+        print(name_data_set, paperp1_data_set)
+        p1_dict = {}
+        for a, b in zip(name_data_set, paperp1_data_set):
+            p1_dict[a] = int(b)
+        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.gca().yaxis.set_major_formatter(PercentFormatter(xmax=1, decimals=0))
+        plt.grid(axis='y')
+        plt.savefig("paper1.jpg")
 
-        return render_template("StaffD/reind.html")
+        # canvas = figureCanvas()
+        # img = io.BytesIO(plt.grid(axis='y'))
+        # fig.savefig(img)
+        # img.seek(0)
+        # return send_file(img, mimetype='img/png')
+        return render_template("StaffD/reind.html", msg=plt.show())
     else:
         flash("Please login")
         return redirect("stafflogpg")
@@ -562,8 +562,25 @@ def viewstud():
             except AttributeError:
                 flash("Student doesn't exist ")
                 return redirect("viewstud")
-
-
+            show_stud = Studinfo.js_re(Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first())
+            Name = show_stud["Name"]
+            gen = show_stud["Gender"]
+            sem = show_stud["Sem_1"]
+            div = show_stud['Div']
+            Paper_1 = show_stud["Paper_1"]
+            Paper_2 = show_stud["Paper_2"]
+            Paper_3 = show_stud["Paper_3"]
+            Paper_4 = show_stud["Paper_4"]
+            Paper_5 = show_stud["Paper_5"]
+            per = show_stud["Overall_Percentage"]
+            ress = show_stud["Stud_Result"]
+            return render_template("staffD/studviewtable.html",
+                                   Name=Name, gen=gen, sem=sem,
+                                   div=div, Paper_1=Paper_1,
+                                   Paper_2=Paper_2, Paper_3=Paper_3,
+                                   Paper_4=Paper_4, Paper_5=Paper_5,
+                                   per=per, ress=ress)
+        return render_template("staffD/viewstud.html")
 
     return render_template("staffD/Adminlog.html")
 
@@ -577,5 +594,3 @@ def adminlogout():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
