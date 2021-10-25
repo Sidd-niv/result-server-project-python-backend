@@ -1,10 +1,12 @@
 import secrets
 import os
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+import re
+from flask import Flask, render_template, request, session, flash, redirect, url_for, Response
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -62,8 +64,11 @@ class Studinfo(db.Model):
     def js_st_id(self):
         return {"stud_if": self.stud_id}
 
-    def js_st_name(self):
+    def js_name(self):
         return {"Name": self.Name}
+
+    def js_p1(self):
+        return {"Paper-1": self.Paper_1}
 
 
 class Teacherlogin(db.Model):
@@ -204,7 +209,7 @@ def stafflogin():
         staff_user_name = request.form.get("stafname")
         staff_user_pass = request.form.get("pwds")
         try:
-            staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(admin_name=staff_user_name).first())
+            staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_user_name).first())
         except AttributeError:
             flash("Invalid UserName or Password")
             return redirect(url_for('stafflogpg'))
@@ -221,6 +226,25 @@ def stafflogin():
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
+        data_name_set1 = [Studinfo.js_name(a) for a in Studinfo.query.all()]
+        data_set_name = []
+        for i in range(len(data_name_set1)):
+            data_set_name.append(data_name_set1[i]["Name"])
+        data_p1_set = [Studinfo.js_p1(a) for a in Studinfo.query.all()]
+        data_set_p1_list = []
+        datasetp_1 = []
+        for i in range(len(data_p1_set)):
+            data_set_p1_list.append(data_p1_set[i]["Paper-1"])
+        for j in range(len(data_set_p1_list)):
+            datasetp_1.append(int(data_set_p1_list[j][0:2]))
+        left_edges = datasetp_1
+        height = data_set_name
+        plt.bar(left_edges, height)
+        plt.title("Percentage Graph")
+        plt.xlabel("Students")
+        plt.ylabel("Percentage")
+        plt.savefig("Paper-1.png")
+
         return render_template("StaffD/reind.html")
     else:
         flash("Please login")
@@ -259,6 +283,15 @@ def adminlogin():
 @app.route("/adminres")
 def adminres():
     if "user_id2" in session:
+        # data_Set1 = Studinfo.js_st_name_paper1(Studinfo)
+        # plt.plot()
+        # plt.title("Student graph")
+        # plt.xlabel("Student")
+        # plt.ylabel("Marks")
+        # plt.xlim(xmin=0, xmax=7)
+        # plt.ylim(ymin=1, ymax=100)
+        # plt.grid(True)
+        # plt.show()
         return render_template("staffD/adminpro.html")
     else:
         flash("Admin login required")
@@ -309,22 +342,111 @@ def updateinfo():
     if "user_id2" in session:
         if request.method == "POST":
             old_name = request.form.get("olname")
-            print(old_name)
             new_name = request.form.get("nename")
             try:
-                update_name = Studinfo.query.get(Name=old_name).first()
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=old_name).first())
             except AttributeError:
                 flash("Invalid Student Name")
                 return redirect(url_for('updateinfo'))
-            print(update_name)
+            update_name = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_name.Name = new_name
             db.session.commit()
+            flash("Student name updated!!")
             return redirect(url_for('updateinfo'))
         return render_template("staffD/studinfoupdate.html")
     else:
         flash("Admin login required")
         return render_template("staffD/Adminlog.html")
 
+
+@app.route("/updateinfop1", methods=["GET", "POST"])
+def updateinfop1():
+    if "user_id2" in session:
+        if request.method == "POST":
+            name = request.form.get("p1name")
+            name_check = re.findall(r'[0-9]+', name)
+            if not name_check:
+                flash('please enter a valid name input')
+                return redirect("updateinfop1")
+            paper_01 = request.form.get("p1")
+            paper_01_check = re.findall(r'[a-z A-Z]+', paper_01)
+            if not paper_01_check:
+                flash('please enter a valid input')
+                return redirect("updateinfop1")
+            try:
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
+            except AttributeError:
+                flash("Invalid Student Name")
+                return redirect("updateinfop1")
+            update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
+            update_p1.Paper_1 = paper_01
+            db.session.commit()
+            flash("Pervious marks updated")
+            return redirect("updateinfop1")
+        return render_template("staffD/studinfoupdate.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route("/updateinfop2", methods=["GET", "POST"])
+def updateinfop2():
+    if "user_id2" in session:
+        if request.method == "POST":
+            name = request.form.get("p2name")
+            name_check = re.findall(r'[0-9]+', name)
+            if not name_check:
+                flash('please enter a valid name input')
+                return render_template("staffD/studinfoupdate.html")
+            paper_02 = request.form.get("p2")
+            paper_01_check = re.findall(r'[a-z A-Z]+', paper_02)
+            if not paper_01_check:
+                flash('please enter a valid input')
+                return render_template("staffD/studinfoupdate.html")
+            try:
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
+            except AttributeError:
+                flash("Invalid Student Name")
+                return redirect(url_for('updateinfop2'))
+            update_p2 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
+            update_p2.Paper_2 = paper_02
+            db.session.commit()
+            flash("Previous student name updated!!")
+            return redirect(url_for('updateinfop2'))
+        return render_template("staffD/studinfoupdate.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route("/updateinfop3", methods=["GET", "POST"])
+def updateinfop3():
+    if "user_id2" in session:
+        if request.method == "POST":
+            name = request.form.get("p3name")
+            name_check = re.findall(r'[0-9]+', name)
+            if not name_check:
+                flash('please enter a valid name input')
+                return render_template("staffD/studinfoupdate.html")
+            paper_03 = request.form.get("p3")
+            paper_01_check = re.findall(r'[a-z A-Z]+', paper_03)
+            if not paper_01_check:
+                flash('please enter a valid input')
+                return render_template("staffD/studinfoupdate.html")
+            try:
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
+            except AttributeError:
+                flash("Invalid Student Name")
+                return render_template("staffD/studinfoupdate.html")
+            update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
+            update_p3.Paper_3 = paper_03
+            db.session.commit()
+            flash("Previous student name updated!!")
+            return render_template("staffD/studinfoupdate.html")
+        return render_template("staffD/studinfoupdate.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
 
 
 @app.route('/adminlogout')

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import re
 
 #
 # students_name = ["Sidd", "ajit", "Adi", "Nik", "vipul", "Parjakta", "Pranali"]
@@ -68,3 +69,13 @@ import matplotlib.pyplot as plt
 #
 #
 # # chart_plot()
+in1 = "STugsub"
+in2 = "90/80"
+
+ans = re.findall(r'[a-z A-Z]+', in1)
+if in1 in ans:
+    print("True")
+else:
+    print("False")
+
+
