@@ -7,6 +7,8 @@ from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
 import matplotlib.pyplot as plt
+import rsa
+publickey, privatekey = rsa.newkeys(512)
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -143,11 +145,12 @@ def studlogin():
             flash("Invalid UserName or Email-ID")
             return redirect(url_for('studloginpg'))
         if stud["stud_name"] == stdName2 and stud["stud_email"] == studEm:
-            otp = gen_otp()
+            otp1 = gen_otp()
             msg = Message("OTP", recipients=[stud["stud_email"]])
-            msg.body = otp
+            msg.body = otp1
             mail.send(msg)
-            session['response'] = {"Name": stdName2, "email": studEm, "OTP": otp}
+            en_otp = rsa.encrypt(otp1.encode(), publickey)
+            session['response'] = {"Name": stdName2, "email": studEm, "OTP": en_otp}
             return render_template("studD/Otppchek.html")
         else:
             return render_template("studD/invalstud.html")
@@ -155,14 +158,14 @@ def studlogin():
 
 @app.route("/Otpstud", methods=["GET", "POST"])
 def otppg():
-    global otp_email, otp, otp_name
+    global otp_email, otp1, otp_name
     if request.method == "POST":
         studOTp = request.form.get("otp")
-        if 'response' in session:
-            otp = session['response']["OTP"]
-            otp_name = session['response']["Name"]
-            otp_email = session['response']["email"]
-        if otp == studOTp:
+        otp1 = session['response']["OTP"]
+        otp_name = session['response']["Name"]
+        otp_email = session['response']["email"]
+        de_otp = rsa.decrypt(otp1, privatekey).decode()
+        if de_otp == studOTp:
             res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
             msg_li = [
                 f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}",
@@ -283,15 +286,6 @@ def adminlogin():
 @app.route("/admindashpg")
 def admindashpg():
     if "user_id2" in session:
-        # data_Set1 = Studinfo.js_st_name_paper1(Studinfo)
-        # plt.plot()
-        # plt.title("Student graph")
-        # plt.xlabel("Student")
-        # plt.ylabel("Marks")
-        # plt.xlim(xmin=0, xmax=7)
-        # plt.ylim(ymin=1, ymax=100)
-        # plt.grid(True)
-        # plt.show()
         return render_template("staffD/adminpro.html")
     else:
         flash("Admin login required")
