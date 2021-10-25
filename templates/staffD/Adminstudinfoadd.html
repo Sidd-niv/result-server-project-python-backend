@@ -46,11 +46,15 @@
   <button type="submit" style="border: 2px solid Tomato;">Add student information</button><br>
 <hr color="Orange">
 </form>
+{{msgadd}}<br>
 {% with messages = get_flashed_messages() %}
     {% for message in messages %}
             {{ message }}
         {% endfor %}
 {% endwith %}
+<form action="/admindashpg">
+    <button type="submit">Back to Admin Dashboard</button>
+</form>
 </body>
 {% endblock %}
 
