@@ -17,9 +17,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Sidd@localhost/fyndacademy
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SECRET_KEY'] = secrets.token_hex(75)
 app.config['MAIL_SERVER'] = "smtp.gmail.com"
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'fyndproject05@gmail.com'
 app.config['MAIL_PASSWORD'] = 'Fyndpro@05'
 app.config['MAIL_DEFAULT_SENDER'] = 'fyndproject05@gmail.com'
@@ -72,6 +72,18 @@ class Studinfo(db.Model):
 
     def js_p1(self):
         return {"Paper-1": self.Paper_1}
+
+    def js_p2(self):
+        return {"Paper-2": self.Paper_2}
+
+    def js_p3(self):
+        return {"Paper-3": self.Paper_3}
+
+    def js_p4(self):
+        return {"Paper-4": self.Paper_4}
+
+    def js_p5(self):
+        return {"Paper-5": self.Paper_5}
 
 
 class Teacherlogin(db.Model):
@@ -133,8 +145,6 @@ def gen_otp():
 
 @app.route("/studlogin", methods=["GET", "POST"])
 def studlogin():
-    if 'response' in session:
-        session.pop('response', None)
     if request.method == "POST":
         studName = request.form.get("name")
         stdName1 = studName.split(" ")
@@ -247,7 +257,7 @@ def resultpg():
         plt.title("Percentage Graph")
         plt.xlabel("Students")
         plt.ylabel("Percentage")
-        plt.savefig("Paper-1.png")
+        plt.savefig("ImagePaper-1.jpg", bbox_inches="tight")
 
         return render_template("StaffD/reind.html")
     else:
@@ -517,7 +527,7 @@ def updateinfop5():
 
 
 @app.route('/studdelpg', methods=["GET", "POST"])
-def adminlogout():
+def studdelpg():
     if "user_id2" in session:
         if request.method == "POST":
             del_info = request.form.get("studnamed")
@@ -530,10 +540,31 @@ def adminlogout():
             db.session.delete(del_stu_in)
             db.session.commit()
             msg_de = "Student data deleted"
-            return render_template("admindelinfo.html", msg_de=msg_de)
-        return render_template("admindelinfo.html")
+            return render_template("staffD/admindelinfo.html", msg_de=msg_de)
+        return render_template("staffD/admindelinfo.html")
     else:
         flash("Admin login required")
+    return render_template("staffD/Adminlog.html")
+
+
+@app.route('/viewstud', methods=["GET", "POST"])
+def viewstud():
+    if "user_id2" in session:
+        if request.method == "POST":
+            stud_name_v = request.form.get("view")
+            name_check = re.findall(r'[0-9]+', stud_name_v)
+            name_valid = []
+            if name_valid != name_check:
+                vm = 'please enter a student name valid input'
+                return render_template("staffD/viewstud.html", msg1=vm)
+            try:
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=stud_name_v).first())
+            except AttributeError:
+                flash("Student doesn't exist ")
+                return redirect("viewstud")
+
+
+
     return render_template("staffD/Adminlog.html")
 
 
@@ -547,59 +578,4 @@ def adminlogout():
 if __name__ == "__main__":
     app.run(debug=True)
 
-# if request.form.get("p_1") == "p_1":
-#     name = request.form.get('p1name')
-#     paper_01 = request.form.get('p1')
-#     try:
-#         update_reso = Studinfo.query.filter_by(Name=name).first()
-#     except AttributeError:
-#         flash("Invalid Student Name")
-#         return redirect(url_for('updateinfo'))
-#     update_reso.Paper_1 = paper_01
-#     db.session.commit()
-#     return redirect(url_for('updateinfo'))
-# if request.form.get("p_2") == "p_2":
-#     name = request.form.get('p2name')
-#     paper_02 = request.form.get('p2')
-#     try:
-#         update_reso = Studinfo.query.filter_by(Name=name).first()
-#     except AttributeError:
-#         flash("Invalid Student Name")
-#         return redirect(url_for('updateinfo'))
-#     update_reso.Paper_2 = paper_02
-#     db.session.commit()
-#     return redirect(url_for('updateinfo'))
-# if request.form.get("p_3") == "p_3":
-#     name = request.form.get('p3name')
-#     paper_03 = request.form.get('p3')
-#     try:
-#         update_reso = Studinfo.query.filter_by(Name=name).first()
-#     except AttributeError:
-#         flash("Invalid Student Name")
-#         return redirect(url_for('updateinfo'))
-#     update_reso.Paper_3 = paper_03
-#     db.session.commit()
-#     return redirect(url_for('updateinfo'))
-# if request.form.get("p_4") == "p_4":
-#     name = request.form.get('p4name')
-#     paper_04 = request.form.get('p4')
-#     try:
-#         update_reso = Studinfo.query.filter_by(Name=name).first()
-#     except AttributeError:
-#         flash("Invalid Student Name")
-#         return redirect(url_for('updateinfo'))
-#     update_reso.Paper_4 = paper_04
-#     db.session.commit()
-#     return redirect(url_for('updateinfo'))
-# if request.form.get("p_5") == "p_5":
-#     name = request.form.get('p5name')
-#     paper_05 = request.form.get('p5')
-#     try:
-#         update_reso = Studinfo.query.filter_by(Name=name).first()
-#     except AttributeError:
-#         flash("Invalid Student Name")
-#         return redirect(url_for('updateinfo'))
-#     update_reso.Paper_5 = paper_05
-#     db.session.commit()
-#     return redirect(url_for('updateinfo'))
-# return render_template("staffD/studinfoupdate.html")
+

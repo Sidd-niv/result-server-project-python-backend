@@ -1,0 +1,37 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Content page</title>
+{% endblock %}
+{% block content %}
+<body>
+<table style="width:100%">
+    <caption>Student Result data</caption>
+    <tr>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Sem</th>
+        <th>Div</th>
+        <th>Paper-1</th>
+        <th>Paper-2</th>
+        <th>Paper-3</th>
+        <th>Paper-4</th>
+        <th>Paper-5</th>
+        <th>Percentage</th>
+        <th>Result</th>
+    </tr>
+    <tr>
+        <td>{{Nmae}}</td>
+        <td>{{gen}}</td>
+        <td>{{sem}}</td>
+        <td>{{div}}</td>
+        <td>{{Paper-1}}</td>
+        <td>{{Paper-2}}</td>
+        <td>{{Paper-3}}</td>
+        <td>{{Paper-4}}</td>
+        <td>{{Paper-5}}</td>
+        <td>{{per}}</td>
+        <td>{{ress}}</td>
+    </tr>
+</table>
+</body>
+{% endblock %}

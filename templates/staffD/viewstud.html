@@ -4,16 +4,20 @@
 {% endblock %}
 {% block content %}
 <body style="background-color:powderblue;">
+<div>
+    <form action="/viewstud" method="post">
+        <label>Enter student name:
+            <input type="text" name="view" required>
+        </label><br>{{msg1}}
+        <button type="submit">View student data</button>
+    </form>
+</div>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
-<!--        {% for message in messages %}-->
+        {% for message in messages %}
             {{ message }}
-<!--        {% endfor %}-->
+        {% endfor %}
     {% endif %}
 {% endwith %}
-<img src="paper-1.jpg" alt="graph">
-<form action="/logout" method="get">
-    <button type="submit" name="logout" value="logout">logout</button>
-</form>
 </body>
 {% endblock %}

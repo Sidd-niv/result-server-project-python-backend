@@ -9,18 +9,26 @@
             {{ message }}
     {% endif %}
 {% endwith %}
-<h1> welcome to admin</h1>
+<h1> welcome to admin panel</h1>
 <div>
-
-</div>
-<form action="/addstudinfoo" method="get">
-    <button type="submit">Add Student result</button>
+    <form action="/addstudinfoo" method="get">
+    <button type="submit">Add Student data</button>
 </form>
-<form action="/updateinfo" method="get">
+</div>
+<div>
+    <form action="/updateinfo" method="get">
     <button type="submit">Update Student data</button>
 </form>
-<form action="/adminlogout" method="get">
+</div>
+<div>
+    <form action="/studdelpg" method="get">
+    <button type="submit">Delete student data</button>
+</form>
+</div>
+<div>
+    <form action="/adminlogout" method="get">
     <button type="submit">logout</button>
 </form>
+</div>
 </body>
 {% endblock %}

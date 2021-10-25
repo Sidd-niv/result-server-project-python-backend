@@ -5,6 +5,7 @@
 {% block content %}
 <body style="background-color:powderblue;">
 <h1>Delete Student data</h1>
+<hr color="red">
 <form action="/studdelpg" method="post">
     <label>Enter Student
         <input type="text" name="studnamed" required>
@@ -18,5 +19,9 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
+<hr color="red">
+<form action="/admindashpg">
+    <button type="submit">Back to Admin Dashboard</button>
+</form>
 </body>
 {% endblock %}
