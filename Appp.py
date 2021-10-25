@@ -346,8 +346,8 @@ def updateinfo():
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=old_name).first())
             except AttributeError:
-                flash("Invalid Student Name")
-                return redirect(url_for('updateinfo'))
+                msg3 = "Student not found"
+                return render_template("staffD/studinfoupdate.html", msg1=msg3)
             update_name = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_name.Name = new_name
             db.session.commit()
@@ -365,24 +365,25 @@ def updateinfop1():
         if request.method == "POST":
             name = request.form.get("p1name")
             name_check = re.findall(r'[0-9]+', name)
-            if not name_check:
-                flash('please enter a valid name input')
-                return redirect("updateinfop1")
-            paper_01 = request.form.get("p1")
-            paper_01_check = re.findall(r'[a-z A-Z]+', paper_01)
-            if not paper_01_check:
-                flash('please enter a valid input')
-                return redirect("updateinfop1")
+            if name in name_check:
+                m1 = 'please enter a student name valid input'
+                return render_template("staffD/studinfoupdate.html", msg1=m1)
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:
-                flash("Invalid Student Name")
-                return redirect("updateinfop1")
+                msg3 = "Student Not found"
+                return render_template("staffD/studinfoupdate.html", msg3=msg3)
+            paper_01 = request.form.get("p1")
+            paper_01_check = re.findall(r'[a-z A-Z]+', paper_01)
+            valid = []
+            if paper_01_check != valid:
+                m1 = 'please enter a valid input'
+                return render_template("staffD/studinfoupdate.html", msg2=m1)
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
             db.session.commit()
-            flash("Pervious marks updated")
-            return redirect("updateinfop1")
+            msg4 = "Paper-1 marks updated for previous student"
+            return render_template("staffD/studinfoupdate.html", msg4=msg4)
         return render_template("staffD/studinfoupdate.html")
     else:
         flash("Admin login required")
@@ -397,12 +398,12 @@ def updateinfop2():
             name_check = re.findall(r'[0-9]+', name)
             if not name_check:
                 flash('please enter a valid name input')
-                return render_template("staffD/studinfoupdate.html")
+                return redirect('updateinfop2')
             paper_02 = request.form.get("p2")
             paper_01_check = re.findall(r'[a-z A-Z]+', paper_02)
             if not paper_01_check:
                 flash('please enter a valid input')
-                return render_template("staffD/studinfoupdate.html")
+                return redirect('updateinfop2')
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:

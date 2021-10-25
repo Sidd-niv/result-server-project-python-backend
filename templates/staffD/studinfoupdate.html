@@ -8,28 +8,23 @@
 <form action="/updateinfo" method="post">
     <label>Enter old name of student
         <input type="text" name="olname" required>
-    </label><br>
+    </label><br><p>{{msg1}}</p>
     <label>Enter new name of student
         <input type="text" name="nename" required>
-    </label><br>
+    </label><br><p>{{msg2}}</p>
     <button type="submit">update Name</button>
+    <p>{{msg3}}</p>
 </form>
 <div>
     <form action="/updateinfop1" method="post">
     <label>Enter Student Name
         <input type="text" name="p1name" required>
-    </label><br>
+    </label><br><p>{{msg1}}</p><p>{{msg3}}</p>
     <label>Paper-1 Marks
     <input type="text" name="p1" required>
-    </label><br>
+    </label><p>{{msg2}}</p><br>
     <button type="submit">update Paper-1 Marks</button>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-            {{ message }}
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
+        <p>{{msg4}}</p>
 </form>
 </div>
 <div>
