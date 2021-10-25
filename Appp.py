@@ -8,6 +8,7 @@ from random import randint
 from mail_pdff_den import *
 import matplotlib.pyplot as plt
 import rsa
+
 publickey, privatekey = rsa.newkeys(512)
 
 app = Flask(__name__)
@@ -513,6 +514,27 @@ def updateinfop5():
     else:
         flash("Admin login required")
         return render_template("staffD/Adminlog.html")
+
+
+@app.route('/studdelpg', methods=["GET", "POST"])
+def adminlogout():
+    if "user_id2" in session:
+        if request.method == "POST":
+            del_info = request.form.get("studnamed")
+            try:
+                check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=del_info).first())
+            except AttributeError:
+                flash("Student data not found")
+                return redirect("studdelpg")
+            del_stu_in = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
+            db.session.delete(del_stu_in)
+            db.session.commit()
+            msg_de = "Student data deleted"
+            return render_template("admindelinfo.html", msg_de=msg_de)
+        return render_template("admindelinfo.html")
+    else:
+        flash("Admin login required")
+    return render_template("staffD/Adminlog.html")
 
 
 @app.route('/adminlogout')

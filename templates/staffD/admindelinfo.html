@@ -1,0 +1,22 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Delete student data</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+<h1>Delete Student data</h1>
+<form action="/studdelpg" method="post">
+    <label>Enter Student
+        <input type="text" name="studnamed" required>
+    </label><br>{{msg_de}}<br>
+    <button type="submit"> Delete</button>
+</form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+</body>
+{% endblock %}
