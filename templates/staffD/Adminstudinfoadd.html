@@ -7,7 +7,7 @@
 <form action="/addstudinfoo" method="post">
     <label>Name of student
     <input type="text" name="studname" required>
-</label><br>
+</label><br>{{msgname}}<br>
 <label>Gender
     <input type="text" name="gen" placeholder="for Male=1 or Female=0" required>
 </label><br>
@@ -21,26 +21,22 @@
     <input type="text" name="div" required>
 </label><br>
 <label>Paper-1 Marks
-    <input type="text" name="p1" required>
-</label><br>
+    <input type="text" name="p1" placeholder="00/80" required>
+</label>
+    <p style="border: 2px solid Tomato;">{{msgp1}}</p>
 <label>Paper-2 Marks
-    <input type="text" name="p2" required>
-</label><br>
+    <input type="text" name="p2" placeholder="00/80" required>
+</label><p style="border: 2px solid Tomato;">{{msgp2}}</p>
 <label>Paper-3 Marks
-    <input type="text" name="p3" required>
-</label><br>
+    <input type="text" name="p3" placeholder="00/80" required>
+</label><p style="border: 2px solid Tomato;">{{msgp3}}</p>
 <label>Paper-4 Marks
-    <input type="text" name="p4" required>
-</label><br>
+    <input type="text" name="p4" placeholder="00/80" required>
+</label><p style="border: 2px solid Tomato;">{{msgp4}}</p>
 <label>Paper-5 Marks
-    <input type="text" name="p5" required>
-</label><br>
-<label>Percentage
-    <input type="text" name="ptg" required>
-</label><br>
-<label>Result
-    <input type="text" name="stre" required>
-</label><br>
+    <input type="text" name="p5" placeholder="00/80" required>
+</label><p style="border: 2px solid Tomato;">{{msgp5}}</p>
+<p style="border: 2px solid Tomato;">{{msgerror}}</p>
 <hr color="Orange">
   <button type="reset" style="border: 2px solid DodgerBlue;" >Reset</button><br>
   <button type="submit" style="border: 2px solid Tomato;">Add student information</button><br>

@@ -310,6 +310,11 @@ def addstudinfoo():
             stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
             new_stud_id = len(stud_id_list) + 1
             new_stud_name = request.form.get('studname')
+            name_check = re.findall(r'[0-9]+', new_stud_name)
+            name_check_list = []
+            if name_check != name_check_list:
+                msgname = 'please enter a student name valid input'
+                return render_template("staffD/Adminstudinfoadd.html", msgname=msgname)
             new_stud_name1 = new_stud_name.split(" ")
             new_stud_name2 = " ".join([i.capitalize() for i in new_stud_name1])
             new_stud_gen = request.form.get('gen')
@@ -317,12 +322,71 @@ def addstudinfoo():
             new_stud_roll = request.form.get('rollno')
             new_stud_div = request.form.get('div')
             new_stud_p1 = request.form.get('p1')
+            try:
+                if new_stud_p1[2] != "/":
+                    msgp1 = 'please enter  12 valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
+                if int(new_stud_p1[0:2]) > 80:
+                    msgp1 = 'please enter 13 valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
+            except IndexError:
+                msgp1 = 'Invalid response'
+                return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
             new_stud_p2 = request.form.get('p2')
+            try:
+                if new_stud_p2[2] != "/":
+                    msgp2 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp2=msgp2)
+                if int(new_stud_p2[0:2]) > 80:
+                    msgp2 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp2=msgp2)
+            except IndexError:
+                msgp2 = 'Invalid response'
+                return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp2)
             new_stud_p3 = request.form.get('p3')
+            try:
+                if new_stud_p3[2] != "/":
+                    msgp3 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
+                if int(new_stud_p3[0:2]) > 80:
+                    msgp3 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
+            except IndexError:
+                msgp3 = 'Invalid response'
+                return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
             new_stud_p4 = request.form.get('p4')
+            try:
+                if new_stud_p4[2] != "/":
+                    msgp4 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
+                if int(new_stud_p4[0:2]) > 80:
+                    msgp4 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
+            except IndexError:
+                msgp4 = 'Invalid response'
+                return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
             new_stud_p5 = request.form.get('p5')
-            new_stud_percen = request.form.get('ptg')
-            new_stud_result = request.form.get('stre')
+            try:
+                if new_stud_p5[2] != "/":
+                    msgp5 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
+                if int(new_stud_p5[0:2]) > 80:
+                    msgp5 = 'please enter valid marks'
+                    return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
+            except IndexError:
+                msgp5 = 'Invalid response'
+                return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp5)
+            try:
+                stud_total = int(new_stud_p1[0:2]) + int(new_stud_p2[0:2]) + int(new_stud_p3[0:2]) + int(new_stud_p4[0:2]) + int(new_stud_p5[0:2])
+            except ValueError:
+                msgerror = "Invalid marks"
+                return render_template("staffD/Adminstudinfoadd.html", msgerror=msgerror)
+            new_stud_percen1 = ((stud_total/400)*100)
+            new_stud_percen = f"{new_stud_percen1}%"
+            if new_stud_percen1 >= 32.00:
+                new_stud_result = "Pass"
+            else:
+                new_stud_result = "Fail"
             old_stud_name = [Studinfo.js_name(a) for a in Studinfo.query.all()]
             if {"Name": new_stud_name2} in old_stud_name:
                 flash(f"{new_stud_name2} data already exists")
@@ -387,13 +451,26 @@ def updateinfop1():
                 msg02 = "Student Not found"
                 return render_template("staffD/studinfoupdate.html", msg02=msg02)
             paper_01 = request.form.get("p1")
-            paper_01_check = re.findall(r'[a-z A-Z]+', paper_01)
-            valid = []
-            if paper_01_check != valid:
-                msg03 = 'please enter a valid input'
-                return render_template("staffD/studinfoupdate.html", msg03=msg03)
+            try:
+                if paper_01[2] != "/":
+                    msgp1er = 'please enter valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
+                if int(paper_01[0:2]) > 80:
+                    msgp1er = 'please enter  valid marks'
+                    return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+            except IndexError:
+                msgp1er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+            try:
+                stud_total = int(paper_01[0:2]) + int(check_data["Paper_2"][0:2]) + int(check_data["Paper_3"][0:2]) + int(check_data["Paper_4"][0:2])\
+                             + int(check_data['Paper_5'][0:2])
+            except ValueError:
+                msgp1er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+            new_stud_percen = ((stud_total/400)*100)
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
+            update_p1.Overall_Percentage = new_stud_percen
             db.session.commit()
             msg04 = "Paper-1 marks updated for previous student"
             return render_template("staffD/studinfoupdate.html", msg04=msg04)
@@ -414,17 +491,27 @@ def updateinfop2():
                 msg21 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg21=msg21)
             paper_02 = request.form.get("p2")
-            paper_02_check = re.findall(r'[a-z A-Z]+', paper_02)
-            papar_list = []
-            if paper_02_check != papar_list:
-                msg22 = "please enter a valid input"
-                return render_template("staffD/studinfoupdate.html", msg22=msg22)
-            if len(paper_02) > 5:
-                msg24 = "Please enter enter a valid input"
-                return render_template("staffD/studinfoupdate.html", msg24=msg24)
-
+            try:
+                if paper_02[2] != "/":
+                    msgp2er = 'please enter valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
+                if int(paper_02[0:2]) > 80:
+                    msgp2er = 'please enter  valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
+            except IndexError:
+                msgp2er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
+            try:
+                stud_total = int(paper_02[0:2]) + int(check_data["Paper_1"][0:2]) + int(
+                    check_data["Paper_3"][0:2]) + int(check_data["Paper_4"][0:2]) \
+                             + int(check_data['Paper_5'][0:2])
+            except ValueError:
+                msgp2er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
+            new_stud_percen = ((stud_total / 400) * 100)
             update_p2 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p2.Paper_2 = paper_02
+            update_p2.Overall_Percentage = new_stud_percen
             db.session.commit()
             msg23 = "Student Paper-2 marks updated!"
             return render_template("staffD/studinfoupdate.html", msg23=msg23)
@@ -445,17 +532,27 @@ def updateinfop3():
                 msg31 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg31=msg31)
             paper_03 = request.form.get("p3")
-            paper_03_check = re.findall(r'[a-z A-Z]+', paper_03)
-            paper_03_valid = []
-            if paper_03_check != paper_03_valid:
-                msg32 = "Please enter numerical input"
-                return render_template("staffD/studinfoupdate.html", msg32=msg32)
-            if len(paper_03) > 5:
-                msg34 = "Please enter enter a valid input"
-                return render_template("staffD/studinfoupdate.html", msg34=msg34)
-
+            try:
+                if paper_03[2] != "/":
+                    msgp3er = 'please enter valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
+                if int(paper_03[0:2]) > 80:
+                    msgp3er = 'please enter  valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
+            except IndexError:
+                msgp3er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
+            try:
+                stud_total = int(paper_03[0:2]) + int(check_data["Paper_1"][0:2]) + int(
+                    check_data["Paper_2"][0:2]) + int(check_data["Paper_4"][0:2]) \
+                             + int(check_data['Paper_5'][0:2])
+            except ValueError:
+                msgp3er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
+            new_stud_percen = ((stud_total / 400) * 100)
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_3 = paper_03
+            update_p3.Overall_Percentage = new_stud_percen
             db.session.commit()
             msg33 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg33=msg33)
@@ -476,17 +573,27 @@ def updateinfop4():
                 msg41 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg41=msg41)
             paper_04 = request.form.get("p4")
-            paper_04_check = re.findall(r'[a-z A-Z]+', paper_04)
-            paper_04_valid = []
-            if paper_04_check != paper_04_valid:
-                msg42 = "Please enter numerical input"
-                return render_template("staffD/studinfoupdate.html", msg42=msg42)
-            if len(paper_04) > 5:
-                msg44 = "Please enter enter a valid input"
-                return render_template("staffD/studinfoupdate.html", msg44=msg44)
-
+            try:
+                if paper_04[2] != "/":
+                    msgp4er = 'please enter valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
+                if int(paper_04[0:2]) > 80:
+                    msgp4er = 'please enter  valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
+            except IndexError:
+                msgp4er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
+            try:
+                stud_total = int(paper_04[0:2]) + int(check_data["Paper_1"][0:2]) + int(
+                    check_data["Paper_2"][0:2]) + int(check_data["Paper_3"][0:2]) \
+                             + int(check_data['Paper_5'][0:2])
+            except ValueError:
+                msgp4er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
+            new_stud_percen = ((stud_total / 400) * 100)
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_4 = paper_04
+            update_p3.Overall_Percentage = new_stud_percen
             db.session.commit()
             msg43 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg43=msg43)
@@ -507,16 +614,27 @@ def updateinfop5():
                 msg51 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg51=msg51)
             paper_05 = request.form.get("p5")
-            paper_05_check = re.findall(r'[a-z A-Z]+', paper_05)
-            paper_05_valid = []
-            if paper_05_check != paper_05_valid:
-                msg52 = "Please enter numerical input"
-                return render_template("staffD/studinfoupdate.html", msg52=msg52)
-            if len(paper_05) > 5:
-                msg53 = "Please enter enter a valid input"
-                return render_template("staffD/studinfoupdate.html", msg53=msg53)
+            try:
+                if paper_05[2] != "/":
+                    msgp5er = 'please enter valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
+                if int(paper_05[0:2]) > 80:
+                    msgp5er = 'please enter  valid marks'
+                    return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
+            except IndexError:
+                msgp5er = 'Invalid response'
+                return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
+            try:
+                stud_total = int(paper_05[0:2]) + int(check_data["Paper_1"][0:2]) + int(
+                    check_data["Paper_2"][0:2]) + int(check_data["Paper_3"][0:2]) \
+                             + int(check_data['Paper_4'][0:2])
+            except ValueError:
+                msgp5er = 'please enter  valid marks'
+                return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
+            new_stud_percen = ((stud_total / 400) * 100)
             update_p5 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p5.Paper_5 = paper_05
+            update_p5.Overall_Percentage = new_stud_percen
             db.session.commit()
             msg54 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg54=msg54)
