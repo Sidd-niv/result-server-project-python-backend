@@ -1,14 +1,12 @@
 import secrets
 import os
 import re
-import io
 from flask import Flask, render_template, request, session, flash, redirect, url_for, Response, send_file
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
 from matplotlib.ticker import PercentFormatter
-from matplotlib.backends.backend_agg import FigureCanvasAgg as figureCanvas
 import matplotlib.pyplot as plt
 import rsa
 
@@ -23,8 +21,8 @@ app.config['MAIL_SERVER'] = "smtp.gmail.com"
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'fyndproject05@gmail.com'
-app.config['MAIL_PASSWORD'] = 'Fyndpro@05'
+app.config['MAIL_USERNAME'] = 'fyndproject5@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Sidd@7021'
 app.config['MAIL_DEFAULT_SENDER'] = 'fyndproject05@gmail.com'
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAIL_SUPPRESS_SEND'] = False
@@ -252,14 +250,9 @@ def resultpg():
         plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
         plt.gca().yaxis.set_major_formatter(PercentFormatter(xmax=1, decimals=0))
         plt.grid(axis='y')
-        plt.savefig("paper1.jpg")
+        plt.savefig("static/paperplot1.png")
 
-        # canvas = figureCanvas()
-        # img = io.BytesIO(plt.grid(axis='y'))
-        # fig.savefig(img)
-        # img.seek(0)
-        # return send_file(img, mimetype='img/png')
-        return render_template("StaffD/reind.html", msg=plt.show())
+        return render_template("StaffD/reind.html", msg="paperplot1", url="static/paperplot1.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
