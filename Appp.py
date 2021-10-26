@@ -166,54 +166,60 @@ def studlogin():
             return render_template("studD/Otppchek.html")
         else:
             return render_template("studD/invalstud.html")
+    else:
+        return redirect(url_for("studlogin"))
 
 
 @app.route("/Otpstud", methods=["GET", "POST"])
 def otppg():
     global otp_email, otp1, otp_name
-    if request.method == "POST":
-        studOTp = request.form.get("otp")
-        otp1 = session['response']["OTP"]
-        otp_name = session['response']["Name"]
-        otp_email = session['response']["email"]
-        de_otp = rsa.decrypt(otp1, privatekey).decode()
-        if de_otp == studOTp:
-            res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
-            msg_li = [
-                f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}",
-                f"Paper-1 Marks: {res_email['Paper_1']}",
-                f"Paper-2 Marks: {res_email['Paper_2']}",
-                f"Paper-3 Marks: {res_email['Paper_3']}",
-                f"Paper-4 Marks: {res_email['Paper_4']}",
-                f"Paper-5 Marks: {res_email['Paper_5']}",
-                f"Percentage: {res_email['Overall_Percentage']}",
-                f"---------------------------------------",
-                f"Result: {res_email['Stud_Result']}"
-            ]
-            pdf = PDF(orientation="P", format="A4")
-            pdf.add_page()  # it will add a page
-            pdf.set_line_width(0.0)
-            pdf.line(5.0, 5.0, 205.0, 5.0)  # top one
-            pdf.line(5.0, 292.0, 205.0, 292.0)  # bottom one
-            pdf.line(5.0, 5.0, 5.0, 292.0)  # left one
-            pdf.line(205.0, 5.0, 205.0, 292.0)  # right one
-            pdf.set_font(family="times", size=16)
-            for line in msg_li:
-                pdf.cell(0, 10, txt=line, ln=True)
-            pdf.output('FYND-Result.pdf', 'F')
-            msg = Message("FYND SEM-1 Result", recipients=[otp_email])
-            msg.body = f"{res_email['Name']} your sem:{res_email['Sem_1']} result"
-            with app.open_resource('FYND-Result.pdf') as fp:
-                msg.attach('FYND-result.pdf', "application/pdf", fp.read())
-            mail.send(msg)
-            if 'response' in session:
-                session.pop('response', None)
-            if os.path.exists("FYND-Result.pdf"):
-                os.remove("FYND-Result.pdf")
-            return render_template("studD/email_re.html")
-        else:
-            flash('Please enter a valid OTP')
-            return redirect(url_for('invalidotppg'))
+    if 'response' in session:
+        if request.method == "POST":
+            studOTp = request.form.get("otp")
+            otp1 = session['response']["OTP"]
+            otp_name = session['response']["Name"]
+            otp_email = session['response']["email"]
+            de_otp = rsa.decrypt(otp1, privatekey).decode()
+            if de_otp == studOTp:
+                res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
+                msg_li = [
+                    f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}",
+                    f"Paper-1 Marks: {res_email['Paper_1']}",
+                    f"Paper-2 Marks: {res_email['Paper_2']}",
+                    f"Paper-3 Marks: {res_email['Paper_3']}",
+                    f"Paper-4 Marks: {res_email['Paper_4']}",
+                    f"Paper-5 Marks: {res_email['Paper_5']}",
+                    f"Percentage: {res_email['Overall_Percentage']}",
+                    f"---------------------------------------",
+                    f"Result: {res_email['Stud_Result']}"
+                ]
+                pdf = PDF(orientation="P", format="A4")
+                pdf.add_page()  # it will add a page
+                pdf.set_line_width(0.0)
+                pdf.line(5.0, 5.0, 205.0, 5.0)  # top one
+                pdf.line(5.0, 292.0, 205.0, 292.0)  # bottom one
+                pdf.line(5.0, 5.0, 5.0, 292.0)  # left one
+                pdf.line(205.0, 5.0, 205.0, 292.0)  # right one
+                pdf.set_font(family="times", size=16)
+                for line in msg_li:
+                    pdf.cell(0, 10, txt=line, ln=True)
+                pdf.output('FYND-Result.pdf', 'F')
+                msg = Message("FYND SEM-1 Result", recipients=[otp_email])
+                msg.body = f"{res_email['Name']} your sem:{res_email['Sem_1']} result"
+                with app.open_resource('FYND-Result.pdf') as fp:
+                    msg.attach('FYND-result.pdf', "application/pdf", fp.read())
+                mail.send(msg)
+                if 'response' in session:
+                    session.pop('response', None)
+                if os.path.exists("FYND-Result.pdf"):
+                    os.remove("FYND-Result.pdf")
+                return render_template("studD/email_re.html")
+            else:
+                flash('Please enter a valid OTP')
+                return redirect(url_for('invalidotppg'))
+    else:
+        flash("Enter username and email-id")
+        return render_template("studD/newstudentlog.html")
 
 
 @app.route("/stafflogin", methods=["GET", "POST"])
@@ -241,23 +247,100 @@ def stafflogin():
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
-        name_data_set = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
+        name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
         paperp1_data_set = [Studinfo.js_p1(a)["Paper-1"][0:2] for a in Studinfo.query.all()]
-        print(name_data_set, paperp1_data_set)
+        # paperp2_data_set = [Studinfo.js_p2(a)["Paper-2"][0:2] for a in Studinfo.query.all()]
+        # paperp3_data_set = [Studinfo.js_p2(a)["Paper-3"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp1_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
-        plt.gca().yaxis.set_major_formatter(PercentFormatter(xmax=1, decimals=0))
+        plt.bar(p1_dict.keys(), [(v/80)*100 for v in p1_dict.values()])
+        plt.xlabel("Students")
+        plt.ylabel("Paper-1 Marks")
         plt.grid(axis='y')
         plt.savefig("static/paperplot1.png")
 
-        return render_template("StaffD/reind.html", msg="paperplot1", url="static/paperplot1.png")
+        return render_template("StaffD/reind.html", msg="This graph shows the percentage of paper_1 scored by student", url="static/paperplot1.png")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
+
+@app.route("/resultpg")
+def resultp2():
+    if "user_id" in session:
+        name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
+        paperp2_data_set = [Studinfo.js_p2(a)["Paper-2"][0:2] for a in Studinfo.query.all()]
+        p1_dict = {}
+        for a, b in zip(name_data_set, paperp2_data_set):
+            p1_dict[a] = int(b)
+        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.xlabel("Students")
+        plt.ylabel("Paper-2 Marks")
+        plt.grid(axis='y')
+        plt.savefig("static/paperplot2.png")
+
+        return render_template("StaffD/reind.html", msg2="This graph shows the percentage of paper_2 scored by student", url="static/paperplot2.png")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
+
+@app.route("/resultpg")
+def resultp3():
+    if "user_id" in session:
+        name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
+        paperp3_data_set = [Studinfo.js_p3(a)["Paper-3"][0:2] for a in Studinfo.query.all()]
+        p1_dict = {}
+        for a, b in zip(name_data_set, paperp3_data_set):
+            p1_dict[a] = int(b)
+        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.xlabel("Students")
+        plt.ylabel("Paper-3 Marks")
+        plt.grid(axis='y')
+        plt.savefig("static/paperplot3.png")
+
+        return render_template("StaffD/reind.html", msg3="This graph shows the percentage of paper_3 scored by student", url="static/paperplot3.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+@app.route("/resultpg")
+def resultp4():
+    if "user_id" in session:
+        name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
+        paperp4_data_set = [Studinfo.js_p4(a)["Paper-4"][0:2] for a in Studinfo.query.all()]
+        p1_dict = {}
+        for a, b in zip(name_data_set, paperp4_data_set):
+            p1_dict[a] = int(b)
+        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.xlabel("Students")
+        plt.ylabel("Paper-4 Marks")
+        plt.grid(axis='y')
+        plt.savefig("static/paperplot4.png")
+
+        return render_template("StaffD/reind.html", msg4="This graph shows the percentage of paper_3 scored by student", url="static/paperplot4.png")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
+
+@app.route("/resultpg")
+def resultp5():
+    if "user_id" in session:
+        name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
+        paperp5_data_set = [Studinfo.js_p5(a)["Paper-5"][0:2] for a in Studinfo.query.all()]
+        p1_dict = {}
+        for a, b in zip(name_data_set, paperp5_data_set):
+            p1_dict[a] = int(b)
+        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.xlabel("Students")
+        plt.ylabel("Paper-4 Marks")
+        plt.grid(axis='y')
+        plt.savefig("static/paperplot4.png")
+
+        return render_template("StaffD/reind.html", msg4="This graph shows the percentage of paper_3 scored by student", url="static/paperplot4.png")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
 @app.route('/logout')
 def stafflogout():
     if "user_id" in session:
@@ -370,11 +453,12 @@ def addstudinfoo():
                 msgp5 = 'Invalid response'
                 return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp5)
             try:
-                stud_total = int(new_stud_p1[0:2]) + int(new_stud_p2[0:2]) + int(new_stud_p3[0:2]) + int(new_stud_p4[0:2]) + int(new_stud_p5[0:2])
+                stud_total = int(new_stud_p1[0:2]) + int(new_stud_p2[0:2]) + int(new_stud_p3[0:2]) + int(
+                    new_stud_p4[0:2]) + int(new_stud_p5[0:2])
             except ValueError:
                 msgerror = "Invalid marks"
                 return render_template("staffD/Adminstudinfoadd.html", msgerror=msgerror)
-            new_stud_percen1 = ((stud_total/400)*100)
+            new_stud_percen1 = ((stud_total / 400) * 100)
             new_stud_percen = f"{new_stud_percen1}%"
             if new_stud_percen1 >= 32.00:
                 new_stud_result = "Pass"
@@ -455,12 +539,13 @@ def updateinfop1():
                 msgp1er = 'Invalid response'
                 return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
             try:
-                stud_total = int(paper_01[0:2]) + int(check_data["Paper_2"][0:2]) + int(check_data["Paper_3"][0:2]) + int(check_data["Paper_4"][0:2])\
+                stud_total = int(paper_01[0:2]) + int(check_data["Paper_2"][0:2]) + int(
+                    check_data["Paper_3"][0:2]) + int(check_data["Paper_4"][0:2]) \
                              + int(check_data['Paper_5'][0:2])
             except ValueError:
                 msgp1er = 'Invalid response'
                 return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
-            new_stud_percen = ((stud_total/400)*100)
+            new_stud_percen = ((stud_total / 400) * 100)
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
             update_p1.Overall_Percentage = new_stud_percen
@@ -675,7 +760,10 @@ def viewstud():
                 return redirect("viewstud")
             show_stud = Studinfo.js_re(Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first())
             Name = show_stud["Name"]
-            gen = show_stud["Gender"]
+            if show_stud["Gender"] == "1":
+                gen = "Male"
+            else:
+                gen = "Female"
             sem = show_stud["Sem_1"]
             div = show_stud['Div']
             Paper_1 = show_stud["Paper_1"]
@@ -692,8 +780,9 @@ def viewstud():
                                    Paper_4=Paper_4, Paper_5=Paper_5,
                                    per=per, ress=ress)
         return render_template("staffD/viewstud.html")
-
-    return render_template("staffD/Adminlog.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
 
 
 @app.route('/adminlogout')

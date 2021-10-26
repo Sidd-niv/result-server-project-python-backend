@@ -4,7 +4,8 @@
 {% endblock %}
 {% block content %}
 <body>
-<table style="width:100%">
+<div>
+    <table border="1" cellspacing="0">
     <caption>Student Result data</caption>
     <tr>
         <th>Name</th>
@@ -33,11 +34,16 @@
         <td>{{ress}}</td>
     </tr>
 </table>
-<form action="/viewstud">
+</div>
+<div>
+    <form action="/viewstud">
     <button type="submit">Back to search student option </button>
 </form>
-<form action="/admindashpg">
+</div>
+<div>
+    <form action="/admindashpg">
     <button type="submit">Back to Admin Dashboard</button>
 </form>
+</div>
 </body>
 {% endblock %}
