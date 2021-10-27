@@ -1,0 +1,60 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Content page</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<hr color="red">
+<p> Add staff login details</p>
+<form action="/staffidadd" method="post">
+    <label> Staff user name
+        <input type="text" name="sfid" required>
+    </label><br>{{namsg}}<br>
+    <label>staff email-id
+        <input type="email" name="sfemail" required>
+    </label><br>{{namsg2}}<br>
+    <label>staff Password
+        <input type="text" name="pwds" required>
+    </label><br>
+    <button type="submit">Add staff login details</button>
+    {{msgadd}}
+</form><br>
+<hr color="red">
+<form action="/upstaffid" method="post">
+    <label> Staff user Name
+        <input type="text" name="upstid" required>
+    </label><br>{{upmsg}}
+    <p>Update staff email</p>
+    <label>update staff email-id
+        <input type="email" name="stemail" >
+    </label><br>{{upmsg1}}
+    <p>update staff password</p>
+    <label>staff Password
+        <input type="text" name="pwds">
+    </label><br>
+    <button type="submit">Add student login details</button>
+</form><br>
+<hr color="red">
+<form action="/admindashpg" method="get">
+    <button type="submit">Back to Admin dashboard</button>
+</form><br>
+<hr color="red">
+<p> Add student login details</p>
+<form action="/stuidadd" method="post">
+    <label> Student Name
+        <input type="text" name="stid" required>
+    </label><br>{{msguser}}<br>
+    <label>student email-id
+        <input type="email" name="stuemail" required>
+    </label><br>{{msgemail}}
+    <button type="submit">Add student login details</button>
+</form><br>{{stad}}<br>
+</body>
+{% endblock %}

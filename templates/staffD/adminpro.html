@@ -1,6 +1,13 @@
 {% extends "staffD/Base1.html" %}
 {% block head %}
 <title>Admin Dashboard</title>
+<style>
+.myDiv {
+  border: 5px outset red;
+  background-color:Tomato;
+  text-align: center;
+}
+</style>
 {% endblock %}
 {% block content %}
 <body style="background-color:powderblue;">
@@ -10,12 +17,12 @@
     {% endif %}
 {% endwith %}
 <h1> welcome to admin panel</h1>
-<div>
+<hr color="">
+<div class="myDiv">
+    <p> Student related changes </p>
     <form action="/addstudinfoo">
     <button type="submit">Add Student data</button>
-</form>
-</div>
-<div>
+</form><br>
     <form action="/updateinfo">
     <button type="submit">Update Student data</button>
 </form>
@@ -28,6 +35,11 @@
 <div>
     <form action="/viewstud">
     <button type="submit">View Student data</button>
+</form>
+</div>
+<div>
+    <form action="/staffidadd">
+    <button type="submit">add staff login info</button>
 </form>
 </div>
 <div>

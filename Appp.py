@@ -2,7 +2,7 @@ import secrets
 import os
 import re
 import matplotlib
-from flask import Flask, render_template, request, session, flash, redirect, url_for, Response, send_file
+from flask import Flask, render_template, request, session, flash, redirect, url_for, jsonify
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
@@ -40,6 +40,12 @@ class Studloginfo(db.Model):
 
     def Js_stud(self):
         return {"stud_name": self.stud_name, "stud_email": self.stud_email}
+
+    def js_stud_user_name(self):
+        return {"stud_name": self.stud_name}
+
+    def js_stud_user_email(self):
+        return {"stud_email": self.stud_email}
 
 
 class Studinfo(db.Model):
@@ -100,6 +106,15 @@ class Teacherlogin(db.Model):
             "teacher_email": self.teacher_email,
             "t_password": self.t_password
         }
+
+    def js_staff_id(self):
+        return {"id": self.Te_id}
+
+    def js_staff_name(self):
+        return {"name": self.teacher_name}
+
+    def js_staff_email(self):
+        return {"email": self.teacher_email}
 
 
 class Admininfo(db.Model):
@@ -324,7 +339,7 @@ def Paper_3():
 def Paper_4():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
-        paperp4_data_set = [int(Studinfo.js_p4(a)["Paper-4"][0:2]) for a in Studinfo.query.all()]
+        paperp4_data_set = [Studinfo.js_p5(a)["Paper-5"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp4_data_set):
             p1_dict[a] = int(b)
@@ -347,7 +362,7 @@ def Paper_4():
 def Paper_5():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
-        paperp5_data_set = [Studinfo.js_p5(a)["Paper-5"][0:2] for a in Studinfo.query.all()]
+        paperp5_data_set = [int(Studinfo.js_p5(a)["Paper-5"][0:2]) for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp5_data_set):
             p1_dict[a] = int(b)
@@ -369,6 +384,16 @@ def Paper_5():
 def stafflogout():
     if "user_id" in session:
         session.pop("user_id", None)
+        if os.path.exists("static/paperplot1.png"):
+            os.remove("static/paperplot1.png")
+        if os.path.exists("static/paperplot2.png"):
+            os.remove("static/paperplot2.png")
+        if os.path.exists("static/paperplot3.png"):
+            os.remove('static/paperplot3.png')
+        if os.path.exists("static/paperplot4.png"):
+            os.remove('static/paperplot4.png')
+        if os.path.exists("static/paperplot5.png"):
+            os.remove('static/paperplot5.png')
     return render_template("staffD/newstafflo.html")
 
 
@@ -417,6 +442,10 @@ def addstudinfoo():
                 return render_template("staffD/Adminstudinfoadd.html", msgname=msgname)
             new_stud_name1 = new_stud_name.split(" ")
             new_stud_name2 = " ".join([i.capitalize() for i in new_stud_name1])
+            stud_name_check = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
+            if new_stud_name2 in stud_name_check:
+                msgname = 'Student Name already exists'
+                return render_template("staffD/Adminstudinfoadd.html", msgname=msgname)
             new_stud_gen = request.form.get('gen')
             new_stud_sem = request.form.get('sem')
             new_stud_roll = request.form.get('rollno')
@@ -424,10 +453,10 @@ def addstudinfoo():
             new_stud_p1 = request.form.get('p1')
             try:
                 if new_stud_p1[2] != "/":
-                    msgp1 = 'please enter  12 valid marks'
+                    msgp1 = 'please enter  valid marks'
                     return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
                 if int(new_stud_p1[0:2]) > 80:
-                    msgp1 = 'please enter 13 valid marks'
+                    msgp1 = 'please enter  valid marks'
                     return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
             except IndexError:
                 msgp1 = 'Invalid response'
@@ -790,24 +819,121 @@ def viewstud():
                 gen = "Female"
             sem = show_stud["Sem_1"]
             div = show_stud['Div']
-            Paper_1 = show_stud["Paper_1"]
-            Paper_2 = show_stud["Paper_2"]
-            Paper_3 = show_stud["Paper_3"]
-            Paper_4 = show_stud["Paper_4"]
-            Paper_5 = show_stud["Paper_5"]
+            Paper1 = show_stud["Paper_1"]
+            Paper2 = show_stud["Paper_2"]
+            Paper3 = show_stud["Paper_3"]
+            Paper4 = show_stud["Paper_4"]
+            Paper5 = show_stud["Paper_5"]
             per = show_stud["Overall_Percentage"]
             ress = show_stud["Stud_Result"]
             return render_template("staffD/studviewtable.html",
                                    Name=Name, gen=gen, sem=sem,
-                                   div=div, Paper_1=Paper_1,
-                                   Paper_2=Paper_2, Paper_3=Paper_3,
-                                   Paper_4=Paper_4, Paper_5=Paper_5,
+                                   div=div, Paper_1=Paper1,
+                                   Paper_2=Paper2, Paper_3=Paper3,
+                                   Paper_4=Paper4, Paper_5=Paper5,
                                    per=per, ress=ress)
         return render_template("staffD/viewstud.html")
     else:
         flash("Admin login required")
         return render_template("staffD/Adminlog.html")
 
+
+@app.route("/staffidadd", methods=["GET", "POST"])
+def staffidadd():
+    if "user_id2" in session:
+        if request.method == "POST":
+            new_staff_name = request.form.get("sfid")
+            new_staff_email = request.form.get("sfemail")
+            new_staff_pass = request.form.get("pwds")
+            name_check = re.findall(r'[0-9]+', new_staff_name)
+            name_check_list = []
+            if name_check != name_check_list:
+                return render_template("staffD/staff_and_student_info_update_add.html",
+                                       namsg="Please enter valid user name")
+            staff_name_check_list = [Teacherlogin.js_staff_name(a)["name"] for a in Teacherlogin.query.all()]
+            print(staff_name_check_list)
+            if new_staff_name in staff_name_check_list:
+                return render_template("staffD/staff_and_student_info_update_add.html",
+                                       namsg="Staff User name already exists")
+            staff_email_check_list = [Teacherlogin.js_staff_email(a)["email"] for a in Teacherlogin.query.all()]
+            if new_staff_email in staff_email_check_list:
+                return render_template("staffD/staff_and_student_info_update_add.html", namsg2="Staff email_id  exists")
+            staff_id_list = [Teacherlogin.js_staff_id(a) for a in Teacherlogin.query.all()]
+            new_id = len(staff_id_list) + 1
+            entry = Teacherlogin(Te_id=new_id, teacher_name=new_staff_name,
+                                 teacher_email=new_staff_email, t_password=new_staff_pass)
+            db.session.add(entry)
+            db.session.commit()
+            return render_template("staffD/staff_and_student_info_update_add.html", namsg3="Staff user name exists")
+        return render_template("staffD/staff_and_student_info_update_add.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route("/upstaffid", methods=["GET", "POST"])
+def upstaffid():
+    if "user_id2" in session:
+        if request.method == "POST":
+            staff_up_name = request.form.get("upstid")
+            try:
+                check_dta = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_up_name).first())
+            except AttributeError:
+                return render_template("staffD/staff_and_student_info_update_add.html", upmsg="staff data not found")
+            update_email = request.form.get("stemail")
+            update_pass = request.form.get("pwds")
+            check_email_null_list = [a for a in update_email]
+            check_pass_null_list = [a for a in update_pass]
+            null_list = []
+            if check_pass_null_list == null_list:
+                update_email_f = Teacherlogin.query.filter_by(Te_id=check_dta["id"]).first()
+                update_email_f.teacher_email = update_email
+                return render_template("staffD/staff_and_student_info_update_add.html", upmsg1="email updated")
+            if check_email_null_list == null_list:
+                update_password = Teacherlogin.query.filter_by(Te_id=check_dta["id"]).first()
+                update_password.t_password = update_pass
+                return render_template("staffD/staff_and_student_info_update_add.html", upmsg2="Password update")
+        return render_template("staffD/staff_and_student_info_update_add.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+
+@app.route("/stuidadd", methods=["GET", "POST"])
+def stuidadd():
+    if "user_id2" in session:
+        if request.method == "POST":
+            new_user_stud = request.form.get("stid")
+            new_user_stud_email = request.form.get("stuemail")
+            data_check_name = [Studloginfo.js_stud_user_name(a)["stud_name"] for a in Studloginfo.query.all()]
+            print(data_check_name)
+            data_check_email = [Studloginfo.js_stud_user_email(a)["stud_email"] for a in Studloginfo.query.all()]
+            print(data_check_email)
+            if new_user_stud in data_check_name:
+                return render_template("staffD/staff_and_student_info_update_add.html", msguser="User already exists")
+            if new_user_stud_email in data_check_email:
+                return render_template("staffD/staff_and_student_info_update_add.html",
+                                       msgemail="User email already exists")
+            entry = Studloginfo(studId=len(data_check_name) + 1,
+                                stud_name=new_user_stud,
+                                stud_email=new_user_stud_email)
+
+            db.session.add(entry)
+            db.session.commit()
+            return render_template("staffD/staff_and_student_info_update_add.html", stad="student login info added")
+        return render_template("staffD/staff_and_student_info_update_add.html")
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
+
+@app.route('/showallstudlog', methods=['GET'])
+def allstudlog():
+    if "user_id2" in session:
+        all_studlog = [Studloginfo.Js_stud(data_items) for data_items in Studloginfo.query.all()]
+        return jsonify(all_studlog)
+    else:
+        flash("Admin login required")
+        return render_template("staffD/Adminlog.html")
 
 @app.route('/adminlogout')
 def adminlogout():
