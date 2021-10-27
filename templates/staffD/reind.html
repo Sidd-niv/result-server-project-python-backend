@@ -6,21 +6,26 @@
 <body style="background-color:powderblue;">
 {% with messages = get_flashed_messages() %}
     {% if messages %}
-<!--        {% for message in messages %}-->
+        {% for message in messages %}
             {{ message }}
-<!--        {% endfor %}-->
+        {% endfor %}
     {% endif %}
 {% endwith %}
-<p>{{msg}}</p>
-<img src="{{url}}" alt="Graph" height="500" width="500">
-<div>
-    <p>{{msg2}}</p>
-<img src="{{url}}" alt="Graph" height="500" width="500">
-</div>
-<div>
-    <p>{{msg3}}</p>
-<img src="{{url}}" alt="Graph" height="500" width="500">
-</div>
+<form action="/Paper_1" method="get">
+    <button type="submit" >Paper-1 plot</button>
+</form><br>
+<form action="/Paper_2" method="get">
+    <button type="submit" >Paper-2 plot</button>
+</form><br>
+<form action="/Paper_3" method="get">
+    <button type="submit" >Paper-3 plot</button>
+</form><br>
+<form action="/Paper_4" method="get">
+    <button type="submit" >Paper-4 plot</button>
+</form><br>
+<form action="/Paper_5" method="get">
+    <button type="submit" >Paper-5 plot</button>
+</form><br>
 <form action="/logout" method="get">
     <button type="submit" name="logout" value="logout">logout</button>
 </form>

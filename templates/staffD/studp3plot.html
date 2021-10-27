@@ -1,0 +1,22 @@
+{% extends "staffD/Base1.html" %}
+{% block head %}
+<title>Content page</title>
+{% endblock %}
+{% block content %}
+<body style="background-color:powderblue;">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div>
+    <p>{{msg3}}</p><br>
+<img src="{{url}}" alt="Graph" height="500" width="500"><br>
+</div><br>
+<form action="/resultpg" method="get">
+    <button type="submit">Back to staff dashboard</button>
+</form>
+</body>
+{% endblock %}

@@ -1,15 +1,16 @@
 import secrets
 import os
 import re
+import matplotlib
 from flask import Flask, render_template, request, session, flash, redirect, url_for, Response, send_file
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from mail_pdff_den import *
-from matplotlib.ticker import PercentFormatter
 import matplotlib.pyplot as plt
 import rsa
 
+matplotlib.use('Agg')
 publickey, privatekey = rsa.newkeys(512)
 
 app = Flask(__name__)
@@ -247,100 +248,123 @@ def stafflogin():
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
+        return render_template("staffD/reind.html")
+    else:
+        flash("Please login")
+        return redirect("stafflogpg")
+
+
+@app.route("/Paper_1")
+def Paper_1():
+    if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
         paperp1_data_set = [Studinfo.js_p1(a)["Paper-1"][0:2] for a in Studinfo.query.all()]
-        # paperp2_data_set = [Studinfo.js_p2(a)["Paper-2"][0:2] for a in Studinfo.query.all()]
-        # paperp3_data_set = [Studinfo.js_p2(a)["Paper-3"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp1_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [(v/80)*100 for v in p1_dict.values()])
+        plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
         plt.ylabel("Paper-1 Marks")
         plt.grid(axis='y')
         plt.savefig("static/paperplot1.png")
 
-        return render_template("StaffD/reind.html", msg="This graph shows the percentage of paper_1 scored by student", url="static/paperplot1.png")
+        return render_template("staffD/studp1plot.html",
+                               msg="This graph shows the percentage of paper_1 scored by student",
+                               url="static/paperplot1.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
-@app.route("/resultpg")
-def resultp2():
+
+@app.route("/Paper_2")
+def Paper_2():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
         paperp2_data_set = [Studinfo.js_p2(a)["Paper-2"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp2_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
         plt.ylabel("Paper-2 Marks")
         plt.grid(axis='y')
         plt.savefig("static/paperplot2.png")
 
-        return render_template("StaffD/reind.html", msg2="This graph shows the percentage of paper_2 scored by student", url="static/paperplot2.png")
+        return render_template("staffD/studp2plot.html",
+                               msg2="This graph shows the percentage of paper_2 scored by student",
+                               url="static/paperplot2.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
-@app.route("/resultpg")
-def resultp3():
+
+@app.route("/Paper_3")
+def Paper_3():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
         paperp3_data_set = [Studinfo.js_p3(a)["Paper-3"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp3_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
         plt.ylabel("Paper-3 Marks")
         plt.grid(axis='y')
         plt.savefig("static/paperplot3.png")
 
-        return render_template("StaffD/reind.html", msg3="This graph shows the percentage of paper_3 scored by student", url="static/paperplot3.png")
+        return render_template("staffD/studp3plot.html",
+                               msg3="This graph shows the percentage of paper_3 scored by student",
+                               url="static/paperplot3.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
-@app.route("/resultpg")
-def resultp4():
+@app.route("/Paper_4")
+def Paper_4():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
-        paperp4_data_set = [Studinfo.js_p4(a)["Paper-4"][0:2] for a in Studinfo.query.all()]
+        paperp4_data_set = [int(Studinfo.js_p4(a)["Paper-4"][0:2]) for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp4_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
         plt.ylabel("Paper-4 Marks")
         plt.grid(axis='y')
         plt.savefig("static/paperplot4.png")
+        print(paperp4_data_set)
 
-        return render_template("StaffD/reind.html", msg4="This graph shows the percentage of paper_3 scored by student", url="static/paperplot4.png")
+        return render_template("staffD/studp4plot.html",
+                               msg4="This graph shows the percentage of paper_3 scored by student",
+                               url="static/paperplot4.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
-@app.route("/resultpg")
-def resultp5():
+
+@app.route("/Paper_5")
+def Paper_5():
     if "user_id" in session:
         name_data_set = [Studinfo.js_name(a)["Name"][0:3] for a in Studinfo.query.all()]
         paperp5_data_set = [Studinfo.js_p5(a)["Paper-5"][0:2] for a in Studinfo.query.all()]
         p1_dict = {}
         for a, b in zip(name_data_set, paperp5_data_set):
             p1_dict[a] = int(b)
-        plt.bar(p1_dict.keys(), [v / 80 for v in p1_dict.values()])
+        plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-4 Marks")
+        plt.ylabel("Paper-5 Marks")
         plt.grid(axis='y')
-        plt.savefig("static/paperplot4.png")
+        plt.savefig("static/paperplot5.png")
 
-        return render_template("StaffD/reind.html", msg4="This graph shows the percentage of paper_3 scored by student", url="static/paperplot4.png")
+        return render_template("staffD/studp5plot.html",
+                               msg5="This graph shows the percentage of paper_3 scored by student",
+                               url="static/paperplot4.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
+
+
 @app.route('/logout')
 def stafflogout():
     if "user_id" in session:
