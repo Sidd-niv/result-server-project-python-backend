@@ -7,42 +7,57 @@
   background-color:Tomato;
   text-align: center;
 }
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }
+.button1 {font-size: 10px;}
 </style>
 {% endblock %}
 {% block content %}
-<body style="background-color:powderblue;">
+<body>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
             {{ message }}
     {% endif %}
 {% endwith %}
-<h1> welcome to admin panel</h1>
-<hr color="">
+<h1> welcome to admin panel</h1>1
 <div class="myDiv">
-    <p> Student related changes </p>
+    <h1  style="color:blue;"> Student related changes </h1>
     <form action="/addstudinfoo">
     <button type="submit">Add Student data</button>
-</form><br>
+        <pre>Create</pre>
+</form>
+    <hr color="black">
     <form action="/updateinfo">
     <button type="submit">Update Student data</button>
+        <pre>Update</pre>
 </form>
-</div>
-<div>
+    <hr color="black">
     <form action="/studdelpg">
     <button type="submit">Delete student data</button>
 </form>
-</div>
-<div>
+    <pre>delete</pre>
+    <hr color="black">
     <form action="/viewstud">
     <button type="submit">View Student data</button>
+        <pre>Read</pre>
 </form>
-</div>
-<div>
+    <hr color="white">
+    <h1  style="color:blue;"> shaff and student login related changes</h1>
     <form action="/staffidadd">
-    <button type="submit">add staff login info</button>
+    <button class="button button1" type="submit">staff and student--> updation creation</button>
+        <pre>CURD operations</pre>
+        <hr color="white">
 </form>
-</div>
-<div>
     <form action="/adminlogout">
     <button type="submit">logout</button>
 </form>

@@ -24,7 +24,7 @@
         <input type="text" name="pwds" required>
     </label><br>
     <button type="submit">Add staff login details</button>
-    {{msgadd}}
+    {{msgdone}}
 </form><br>
 <hr color="red">
 <form action="/upstaffid" method="post">
@@ -39,11 +39,8 @@
     <label>staff Password
         <input type="text" name="pwds">
     </label><br>
-    <button type="submit">Add student login details</button>
-</form><br>
-<hr color="red">
-<form action="/admindashpg" method="get">
-    <button type="submit">Back to Admin dashboard</button>
+    <button type="submit">update staff login details</button>
+    {{upmsg3}}
 </form><br>
 <hr color="red">
 <p> Add student login details</p>
@@ -56,5 +53,9 @@
     </label><br>{{msgemail}}
     <button type="submit">Add student login details</button>
 </form><br>{{stad}}<br>
+<hr color="red">
+<form action="/admindashpg" method="get">
+    <button type="submit">Back to Admin dashboard</button>
+</form><br>
 </body>
 {% endblock %}

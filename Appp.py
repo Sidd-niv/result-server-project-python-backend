@@ -97,8 +97,8 @@ class Studinfo(db.Model):
 class Teacherlogin(db.Model):
     Te_id = db.Column(db.Integer(), primary_key=True)
     teacher_name = db.Column(db.String(60), nullable=False)
-    teacher_email = db.Column(db.String(80), unique=True, nullable=False)
-    t_password = db.Column(db.String(60), unique=True, nullable=False)
+    teacher_email = db.Column(db.String(80), nullable=False)
+    t_password = db.Column(db.String(60), nullable=False)
 
     def js_log(self):
         return {
@@ -115,6 +115,9 @@ class Teacherlogin(db.Model):
 
     def js_staff_email(self):
         return {"email": self.teacher_email}
+
+    def js_staff_pass(self):
+        return {"pass": self.teacher_email}
 
 
 class Admininfo(db.Model):
@@ -164,7 +167,8 @@ def gen_otp():
 def studlogin():
     if request.method == "POST":
         studName = request.form.get("name")
-        stdName1 = studName.split(" ")
+        stdName01 = studName.strip()
+        stdName1 = stdName01.split(" ")
         stdName2 = " ".join([i.capitalize() for i in stdName1])
         studEm = request.form.get("email")
         try:
@@ -284,7 +288,7 @@ def Paper_1():
         plt.savefig("static/paperplot1.png")
 
         return render_template("staffD/studp1plot.html",
-                               msg="This graph shows the percentage of paper_1 scored by student",
+                               msg="This graph shows the marks of paper_1 scored by students",
                                url="static/paperplot1.png")
     else:
         flash("Please login")
@@ -306,7 +310,7 @@ def Paper_2():
         plt.savefig("static/paperplot2.png")
 
         return render_template("staffD/studp2plot.html",
-                               msg2="This graph shows the percentage of paper_2 scored by student",
+                               msg2="This graph shows the Marks of paper_2 scored by students",
                                url="static/paperplot2.png")
     else:
         flash("Please login")
@@ -328,7 +332,7 @@ def Paper_3():
         plt.savefig("static/paperplot3.png")
 
         return render_template("staffD/studp3plot.html",
-                               msg3="This graph shows the percentage of paper_3 scored by student",
+                               msg3="This graph shows the marks of paper_3 scored by students",
                                url="static/paperplot3.png")
     else:
         flash("Please login")
@@ -351,7 +355,7 @@ def Paper_4():
         print(paperp4_data_set)
 
         return render_template("staffD/studp4plot.html",
-                               msg4="This graph shows the percentage of paper_3 scored by student",
+                               msg4="This graph shows the marks of paper_4 scored by students",
                                url="static/paperplot4.png")
     else:
         flash("Please login")
@@ -373,8 +377,8 @@ def Paper_5():
         plt.savefig("static/paperplot5.png")
 
         return render_template("staffD/studp5plot.html",
-                               msg5="This graph shows the percentage of paper_3 scored by student",
-                               url="static/paperplot4.png")
+                               msg5="This graph shows the marks of paper_5 scored by student",
+                               url="static/paperplot5.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
@@ -434,7 +438,7 @@ def addstudinfoo():
         if request.method == 'POST':
             stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
             new_stud_id = len(stud_id_list) + 1
-            new_stud_name = request.form.get('studname')
+            new_stud_name = request.form.get('studname').strip()
             name_check = re.findall(r'[0-9]+', new_stud_name)
             name_check_list = []
             if name_check != name_check_list:
@@ -448,9 +452,9 @@ def addstudinfoo():
                 return render_template("staffD/Adminstudinfoadd.html", msgname=msgname)
             new_stud_gen = request.form.get('gen')
             new_stud_sem = request.form.get('sem')
-            new_stud_roll = request.form.get('rollno')
+            new_stud_roll = request.form.get('rollno').strip()
             new_stud_div = request.form.get('div')
-            new_stud_p1 = request.form.get('p1')
+            new_stud_p1 = request.form.get('p1').strip()
             try:
                 if new_stud_p1[2] != "/":
                     msgp1 = 'please enter  valid marks'
@@ -461,7 +465,7 @@ def addstudinfoo():
             except IndexError:
                 msgp1 = 'Invalid response'
                 return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
-            new_stud_p2 = request.form.get('p2')
+            new_stud_p2 = request.form.get('p2').strip()
             try:
                 if new_stud_p2[2] != "/":
                     msgp2 = 'please enter valid marks'
@@ -472,7 +476,7 @@ def addstudinfoo():
             except IndexError:
                 msgp2 = 'Invalid response'
                 return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp2)
-            new_stud_p3 = request.form.get('p3')
+            new_stud_p3 = request.form.get('p3').strip()
             try:
                 if new_stud_p3[2] != "/":
                     msgp3 = 'please enter valid marks'
@@ -483,7 +487,7 @@ def addstudinfoo():
             except IndexError:
                 msgp3 = 'Invalid response'
                 return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
-            new_stud_p4 = request.form.get('p4')
+            new_stud_p4 = request.form.get('p4').strip()
             try:
                 if new_stud_p4[2] != "/":
                     msgp4 = 'please enter valid marks'
@@ -494,7 +498,7 @@ def addstudinfoo():
             except IndexError:
                 msgp4 = 'Invalid response'
                 return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
-            new_stud_p5 = request.form.get('p5')
+            new_stud_p5 = request.form.get('p5').strip()
             try:
                 if new_stud_p5[2] != "/":
                     msgp5 = 'please enter valid marks'
@@ -554,6 +558,8 @@ def updateinfo():
             except AttributeError:
                 m2 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg3=m2)
+            update_login_name = Studloginfo.query.filter_by(stud_name=old_name).first()
+            update_login_name.stud_name = new_name
             update_name = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_name.Name = new_name
             db.session.commit()
@@ -569,7 +575,7 @@ def updateinfo():
 def updateinfop1():
     if "user_id2" in session:
         if request.method == "POST":
-            name = request.form.get("p1name")
+            name = request.form.get("p1name").strip()
             name_check = re.findall(r'[0-9]+', name)
             name_check_list = []
             if name_check != name_check_list:
@@ -587,17 +593,17 @@ def updateinfop1():
                     return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
                 if int(paper_01[0:2]) > 80:
                     msgp1er = 'please enter  valid marks'
-                    return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+                    return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
             except IndexError:
                 msgp1er = 'Invalid response'
-                return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+                return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
             try:
                 stud_total = int(paper_01[0:2]) + int(check_data["Paper_2"][0:2]) + int(
                     check_data["Paper_3"][0:2]) + int(check_data["Paper_4"][0:2]) \
                              + int(check_data['Paper_5'][0:2])
             except ValueError:
                 msgp1er = 'Invalid response'
-                return render_template("staffD/studinfoupdate.html.html", msgp1er=msgp1er)
+                return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
             new_stud_percen = ((stud_total / 400) * 100)
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
@@ -864,7 +870,7 @@ def staffidadd():
                                  teacher_email=new_staff_email, t_password=new_staff_pass)
             db.session.add(entry)
             db.session.commit()
-            return render_template("staffD/staff_and_student_info_update_add.html", namsg3="Staff user name exists")
+            return render_template("staffD/staff_and_student_info_update_add.html", msgdone="User created")
         return render_template("staffD/staff_and_student_info_update_add.html")
     else:
         flash("Admin login required")
@@ -885,6 +891,12 @@ def upstaffid():
             check_email_null_list = [a for a in update_email]
             check_pass_null_list = [a for a in update_pass]
             null_list = []
+            if check_email_null_list != null_list and check_pass_null_list != null_list:
+                update_allemail_f = Teacherlogin.query.filter_by(Te_id=check_dta["id"]).first()
+                update_allemail_f.teacher_email = update_email
+                update_allemail_f.t_password = update_pass
+                return render_template("staffD/staff_and_student_info_update_add.html",
+                                       upmsg3="email and password updated")
             if check_pass_null_list == null_list:
                 update_email_f = Teacherlogin.query.filter_by(Te_id=check_dta["id"]).first()
                 update_email_f.teacher_email = update_email
@@ -903,8 +915,8 @@ def upstaffid():
 def stuidadd():
     if "user_id2" in session:
         if request.method == "POST":
-            new_user_stud = request.form.get("stid")
-            new_user_stud_email = request.form.get("stuemail")
+            new_user_stud = request.form.get("stid").strip()
+            new_user_stud_email = request.form.get("stuemail").strip()
             data_check_name = [Studloginfo.js_stud_user_name(a)["stud_name"] for a in Studloginfo.query.all()]
             print(data_check_name)
             data_check_email = [Studloginfo.js_stud_user_email(a)["stud_email"] for a in Studloginfo.query.all()]
@@ -926,6 +938,7 @@ def stuidadd():
         flash("Admin login required")
         return render_template("staffD/Adminlog.html")
 
+
 @app.route('/showallstudlog', methods=['GET'])
 def allstudlog():
     if "user_id2" in session:
@@ -934,6 +947,7 @@ def allstudlog():
     else:
         flash("Admin login required")
         return render_template("staffD/Adminlog.html")
+
 
 @app.route('/adminlogout')
 def adminlogout():
