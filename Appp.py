@@ -648,7 +648,7 @@ def updateinfop1():
             new_stud_percen = ((stud_total / 400) * 100)
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
-            update_p1.Overall_Percentage = new_stud_percen
+            update_p1.Overall_Percentage = f"{new_stud_percen}%"
             db.session.commit()
             msg04 = "Paper-1 marks updated for previous student"
             return render_template("staffD/studinfoupdate.html", msg04=msg04)
@@ -690,7 +690,7 @@ def updateinfop2():
             new_stud_percen = ((stud_total / 400) * 100)
             update_p2 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p2.Paper_2 = paper_02
-            update_p2.Overall_Percentage = new_stud_percen
+            update_p2.Overall_Percentage = f"{new_stud_percen}%"
             db.session.commit()
             msg23 = "Student Paper-2 marks updated!"
             return render_template("staffD/studinfoupdate.html", msg23=msg23)
@@ -732,7 +732,7 @@ def updateinfop3():
             new_stud_percen = ((stud_total / 400) * 100)
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_3 = paper_03
-            update_p3.Overall_Percentage = new_stud_percen
+            update_p3.Overall_Percentage = f"{new_stud_percen}%"
             db.session.commit()
             msg33 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg33=msg33)
@@ -774,7 +774,7 @@ def updateinfop4():
             new_stud_percen = ((stud_total / 400) * 100)
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_4 = paper_04
-            update_p3.Overall_Percentage = new_stud_percen
+            update_p3.Overall_Percentage = f"{new_stud_percen}%"
             db.session.commit()
             msg43 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg43=msg43)
@@ -816,7 +816,7 @@ def updateinfop5():
             new_stud_percen = ((stud_total / 400) * 100)
             update_p5 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p5.Paper_5 = paper_05
-            update_p5.Overall_Percentage = new_stud_percen
+            update_p5.Overall_Percentage = f"{new_stud_percen}%"
             db.session.commit()
             msg54 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg54=msg54)
@@ -841,7 +841,6 @@ def studdelpg():
             db.session.delete(del_stu_in)
             db.session.commit()
             stud_name_list = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
-            print(stud_name_list)
             j = 0
             for i in stud_name_list:
                 j += 1
