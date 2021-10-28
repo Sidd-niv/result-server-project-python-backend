@@ -9,130 +9,25 @@ from random import randint
 from mail_pdff_den import *
 import matplotlib.pyplot as plt
 import rsa
+from config1 import *
 
+# use matplotlib.use to generate multiple graphs
 matplotlib.use('Agg')
+# creating public-private key for encryption and decryption
 publickey, privatekey = rsa.newkeys(512)
 
+# Initialization
 app = Flask(__name__)
+
+# Initializatiom
 db = SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Sidd@localhost/fyndacademy'
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-app.config['SECRET_KEY'] = secrets.token_hex(75)
-app.config['MAIL_SERVER'] = "smtp.gmail.com"
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'fyndproject5@gmail.com'
-app.config['MAIL_PASSWORD'] = 'Sidd@7021'
-app.config['MAIL_DEFAULT_SENDER'] = 'fyndproject05@gmail.com'
-app.config['MAIL_MAX_EMAILS'] = None
-app.config['MAIL_SUPPRESS_SEND'] = False
-app.config['MAIL_ASCII_ATTACHMENTS'] = False
+
+# Initialization
 mail = Mail()
 mail.init_app(app)
-m_pdf = FPDF()
 
 
-class Studloginfo(db.Model):
-    studId = db.Column(db.Integer(), primary_key=True)
-    stud_name = db.Column(db.String(45), nullable=False)
-    stud_email = db.Column(db.String(60), unique=True, nullable=False)
-
-    def Js_stud(self):
-        return {"stud_name": self.stud_name, "stud_email": self.stud_email}
-
-    def js_stud_user_name(self):
-        return {"stud_name": self.stud_name}
-
-    def js_stud_user_email(self):
-        return {"stud_email": self.stud_email}
-
-
-class Studinfo(db.Model):
-    stud_id = db.Column(db.Integer(), primary_key=True)
-    Name = db.Column(db.String(60), unique=False, nullable=False)
-    Gender = db.Column(db.String(45), unique=False, nullable=False)
-    Sem = db.Column(db.Integer(), unique=False, nullable=False)
-    Roll_no = db.Column(db.Integer(), unique=False, nullable=False)
-    Div = db.Column(db.String(10), unique=False, nullable=False)
-    Paper_1 = db.Column(db.String(45), unique=False, nullable=False)
-    Paper_2 = db.Column(db.String(45), unique=False, nullable=False)
-    Paper_3 = db.Column(db.String(45), unique=False, nullable=False)
-    Paper_4 = db.Column(db.String(45), unique=False, nullable=False)
-    Paper_5 = db.Column(db.String(45), unique=False, nullable=False)
-    Overall_Percentage = db.Column(db.String(45), unique=False, nullable=False)
-    Stud_Result = db.Column(db.String(45), unique=False, nullable=False)
-
-    def js_re(self):
-        return {"stud_id": self.stud_id, "Name": self.Name, "Gender": self.Gender,
-                "Sem_1": self.Sem, "Roll_no": self.Roll_no,
-                "Div": self.Div, "Paper_1": self.Paper_1,
-                "Paper_2": self.Paper_2, "Paper_3": self.Paper_3,
-                "Paper_4": self.Paper_4, "Paper_5": self.Paper_5,
-                "Overall_Percentage": self.Overall_Percentage,
-                "Stud_Result": self.Stud_Result}
-
-    def js_st_id(self):
-        return {"stud_if": self.stud_id}
-
-    def js_name(self):
-        return {"Name": self.Name}
-
-    def js_p1(self):
-        return {"Paper-1": self.Paper_1}
-
-    def js_p2(self):
-        return {"Paper-2": self.Paper_2}
-
-    def js_p3(self):
-        return {"Paper-3": self.Paper_3}
-
-    def js_p4(self):
-        return {"Paper-4": self.Paper_4}
-
-    def js_p5(self):
-        return {"Paper-5": self.Paper_5}
-
-
-class Teacherlogin(db.Model):
-    Te_id = db.Column(db.Integer(), primary_key=True)
-    teacher_name = db.Column(db.String(60), nullable=False)
-    teacher_email = db.Column(db.String(80), nullable=False)
-    t_password = db.Column(db.String(60), nullable=False)
-
-    def js_log(self):
-        return {
-            "id": self.Te_id, "teacher_name": self.teacher_name,
-            "teacher_email": self.teacher_email,
-            "t_password": self.t_password
-        }
-
-    def js_staff_id(self):
-        return {"id": self.Te_id}
-
-    def js_staff_name(self):
-        return {"name": self.teacher_name}
-
-    def js_staff_email(self):
-        return {"email": self.teacher_email}
-
-    def js_staff_pass(self):
-        return {"pass": self.teacher_email}
-
-
-class Admininfo(db.Model):
-    admin_name = db.Column(db.String(60), primary_key=True)
-    admin_email = db.Column(db.String(80), unique=True, nullable=False)
-    admin_pass = db.Column(db.String(60), unique=True, nullable=False)
-
-    def js_add(self):
-        return {
-            "AdminD": self.admin_name,
-            "Email": self.admin_email,
-            "Password": self.admin_pass
-        }
-
-
+# Home Page
 @app.route("/")
 def home():
     return render_template("oppstudshaff.html")
@@ -158,11 +53,8 @@ def invalidotppg():
     return render_template("studD/Otppchek.html")
 
 
-def gen_otp():
-    otP = "".join([str(randint(1000, 9999)) for _ in range(1)])
-    return otP
-
-
+# Phase-1
+# Student login to verify user name and email-id from database
 @app.route("/studlogin", methods=["GET", "POST"])
 def studlogin():
     if request.method == "POST":
@@ -177,19 +69,21 @@ def studlogin():
             flash("Invalid UserName or Email-ID")
             return redirect(url_for('studloginpg'))
         if stud["stud_name"] == stdName2 and stud["stud_email"] == studEm:
-            otp1 = gen_otp()
+            otp_1 = gen_otp()
             msg = Message("OTP", recipients=[stud["stud_email"]])
-            msg.body = otp1
+            msg.body = otp_1
             mail.send(msg)
-            en_otp = rsa.encrypt(otp1.encode(), publickey)
+            en_otp = rsa.encrypt(otp_1.encode(), publickey)
             session['response'] = {"Name": stdName2, "email": studEm, "OTP": en_otp}
             return render_template("studD/Otppchek.html")
         else:
-            return render_template("studD/invalstud.html")
+            flash("Invalid UserName or Email-ID")
+            return redirect(url_for('studlogin'))
     else:
         return redirect(url_for("studlogin"))
 
 
+# OTP verify and sending email from database
 @app.route("/Otpstud", methods=["GET", "POST"])
 def otppg():
     global otp_email, otp1, otp_name
@@ -242,6 +136,8 @@ def otppg():
         return render_template("studD/newstudentlog.html")
 
 
+# Phase-2
+# Staff--> Teacher login by verifying user input from databse
 @app.route("/stafflogin", methods=["GET", "POST"])
 def stafflogin():
     if "user_id" in session:
@@ -264,6 +160,7 @@ def stafflogin():
         return render_template("newstafflog.html")
 
 
+# Teacher dashboard page
 @app.route("/resultpg")
 def resultpg():
     if "user_id" in session:
@@ -273,6 +170,7 @@ def resultpg():
         return redirect("stafflogpg")
 
 
+# Paper-1 graph based data retrieved from database
 @app.route("/Paper_1")
 def Paper_1():
     if "user_id" in session:
@@ -283,18 +181,19 @@ def Paper_1():
             p1_dict[a] = int(b)
         plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-1 Marks")
+        plt.ylabel("Paper-1 Marks in perecentage")
         plt.grid(axis='y')
         plt.savefig("static/paperplot1.png")
 
         return render_template("staffD/studp1plot.html",
-                               msg="This graph shows the marks of paper_1 scored by students",
+                               msg="This graph shows the marks of paper_1 scored by students in form of precentage ",
                                url="static/paperplot1.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+# Paper-2 graph based data retrieved from database
 @app.route("/Paper_2")
 def Paper_2():
     if "user_id" in session:
@@ -305,18 +204,19 @@ def Paper_2():
             p1_dict[a] = int(b)
         plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-2 Marks")
+        plt.ylabel("Paper-2 Marks precentage")
         plt.grid(axis='y')
         plt.savefig("static/paperplot2.png")
 
         return render_template("staffD/studp2plot.html",
-                               msg2="This graph shows the Marks of paper_2 scored by students",
+                               msg2="This graph shows the Marks of paper_2 scored by students in form of precentage",
                                url="static/paperplot2.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+# Paper-3 graph based data retrieved from database
 @app.route("/Paper_3")
 def Paper_3():
     if "user_id" in session:
@@ -327,18 +227,19 @@ def Paper_3():
             p1_dict[a] = int(b)
         plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-3 Marks")
+        plt.ylabel("Paper-3 Marks Percentage")
         plt.grid(axis='y')
         plt.savefig("static/paperplot3.png")
 
         return render_template("staffD/studp3plot.html",
-                               msg3="This graph shows the marks of paper_3 scored by students",
+                               msg3="This graph shows the marks of paper_3 scored by students in form of precentage",
                                url="static/paperplot3.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+# Paper-4 graph based data retrieved from database
 @app.route("/Paper_4")
 def Paper_4():
     if "user_id" in session:
@@ -349,19 +250,20 @@ def Paper_4():
             p1_dict[a] = int(b)
         plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-4 Marks")
+        plt.ylabel("Paper-4 Marks percentage")
         plt.grid(axis='y')
         plt.savefig("static/paperplot4.png")
         print(paperp4_data_set)
 
         return render_template("staffD/studp4plot.html",
-                               msg4="This graph shows the marks of paper_4 scored by students",
+                               msg4="This graph shows the marks of paper_4 scored by students in form of precentage",
                                url="static/paperplot4.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+# Paper-5 graph based data retrieved from database
 @app.route("/Paper_5")
 def Paper_5():
     if "user_id" in session:
@@ -372,22 +274,24 @@ def Paper_5():
             p1_dict[a] = int(b)
         plt.bar(p1_dict.keys(), [(v / 80) * 100 for v in p1_dict.values()])
         plt.xlabel("Students")
-        plt.ylabel("Paper-5 Marks")
+        plt.ylabel("Paper-5 Marks percentage")
         plt.grid(axis='y')
         plt.savefig("static/paperplot5.png")
 
         return render_template("staffD/studp5plot.html",
-                               msg5="This graph shows the marks of paper_5 scored by student",
+                               msg5="This graph shows the marks of paper_5 scored by student in form of precentage",
                                url="static/paperplot5.png")
     else:
         flash("Please login")
         return redirect("stafflogpg")
 
 
+# Staff logout using session
 @app.route('/logout')
 def stafflogout():
     if "user_id" in session:
         session.pop("user_id", None)
+        # delete logic to clear file generated for teachers
         if os.path.exists("static/paperplot1.png"):
             os.remove("static/paperplot1.png")
         if os.path.exists("static/paperplot2.png"):
@@ -401,13 +305,15 @@ def stafflogout():
     return render_template("staffD/newstafflo.html")
 
 
+# Phase-3
+# Admin login by verifying client login detail
 @app.route("/adminlogin", methods=["GET", "POST"])
 def adminlogin():
     if "user_id2" in session:
         session.pop("user_id2", None)
     if request.method == 'POST':
-        add_user_name = request.form.get("addname")
-        add_user_pass = request.form.get("addpwds")
+        add_user_name = request.form.get("addname").strip()
+        add_user_pass = request.form.get("addpwds").strip()
         try:
             admin_info = Admininfo.js_add(Admininfo.query.filter_by(admin_name=add_user_name).first())
         except AttributeError:
@@ -423,6 +329,7 @@ def adminlogin():
         return render_template("staffD/Adminlog.html")
 
 
+# Admin dashboard
 @app.route("/admindashpg")
 def admindashpg():
     if "user_id2" in session:
@@ -432,6 +339,7 @@ def admindashpg():
         return render_template("staffD/Adminlog.html")
 
 
+# Adding new student result details
 @app.route("/addstudinfoo", methods=['GET', 'POST'])
 def addstudinfoo():
     if "user_id2" in session:
@@ -458,10 +366,10 @@ def addstudinfoo():
             new_stud_p1 = request.form.get('p1').strip()
             try:
                 if new_stud_p1[2] != "/":
-                    msgp1 = 'please enter  valid marks'
+                    msgp1 = 'please enter a valid input in paper-1'
                     return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
-                if int(new_stud_p1[0:2]) > 80:
-                    msgp1 = 'please enter  valid marks'
+                if int(new_stud_p1[0:2]) > 80 or int(new_stud_p1[3::]) > 80:
+                    msgp1 = 'please enter valid marks of paper-1 '
                     return render_template("staffD/Adminstudinfoadd.html", msgp1=msgp1)
             except IndexError:
                 msgp1 = 'Invalid response'
@@ -469,10 +377,10 @@ def addstudinfoo():
             new_stud_p2 = request.form.get('p2').strip()
             try:
                 if new_stud_p2[2] != "/":
-                    msgp2 = 'please enter valid marks'
+                    msgp2 = 'please enter a valid input in paper-2'
                     return render_template("staffD/Adminstudinfoadd.html", msgp2=msgp2)
-                if int(new_stud_p2[0:2]) > 80:
-                    msgp2 = 'please enter valid marks'
+                if int(new_stud_p2[0:2]) > 80 or int(new_stud_p2[3::]) > 80:
+                    msgp2 = 'please enter valid marks for paper-2'
                     return render_template("staffD/Adminstudinfoadd.html", msgp2=msgp2)
             except IndexError:
                 msgp2 = 'Invalid response'
@@ -480,10 +388,10 @@ def addstudinfoo():
             new_stud_p3 = request.form.get('p3').strip()
             try:
                 if new_stud_p3[2] != "/":
-                    msgp3 = 'please enter valid marks'
+                    msgp3 = 'please enter a valid input in paper-3'
                     return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
-                if int(new_stud_p3[0:2]) > 80:
-                    msgp3 = 'please enter valid marks'
+                if int(new_stud_p3[0:2]) > 80 or int(new_stud_p3[3::]) > 80:
+                    msgp3 = 'please enter valid marks for paper-3'
                     return render_template("staffD/Adminstudinfoadd.html", msgp3=msgp3)
             except IndexError:
                 msgp3 = 'Invalid response'
@@ -491,10 +399,10 @@ def addstudinfoo():
             new_stud_p4 = request.form.get('p4').strip()
             try:
                 if new_stud_p4[2] != "/":
-                    msgp4 = 'please enter valid marks'
+                    msgp4 = 'please enter a valid input in paper-4'
                     return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
-                if int(new_stud_p4[0:2]) > 80:
-                    msgp4 = 'please enter valid marks'
+                if int(new_stud_p4[0:2]) > 80 or int(new_stud_p1[3::]) > 80:
+                    msgp4 = 'please enter valid marks for paper-4'
                     return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
             except IndexError:
                 msgp4 = 'Invalid response'
@@ -502,9 +410,9 @@ def addstudinfoo():
             new_stud_p5 = request.form.get('p5').strip()
             try:
                 if new_stud_p5[2] != "/":
-                    msgp5 = 'please enter valid marks'
+                    msgp5 = 'please enter a valid input in paper-5'
                     return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
-                if int(new_stud_p5[0:2]) > 80:
+                if int(new_stud_p5[0:2]) > 80 or int(new_stud_p1[3::]) > 80:
                     msgp5 = 'please enter valid marks'
                     return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
             except IndexError:
@@ -543,12 +451,13 @@ def addstudinfoo():
         return render_template("staffD/Adminlog.html")
 
 
+# Student name updating function
 @app.route("/updateinfo", methods=["GET", "POST"])
 def updateinfo():
     if "user_id2" in session:
         if request.method == "POST":
-            old_name = request.form.get("olname")
-            new_name = request.form.get("nename")
+            old_name = request.form.get("olname").strip()
+            new_name = request.form.get("nename").strip()
             name_check = re.findall(r'[0-9]+', new_name)
             name_valid = []
             if name_valid != name_check:
@@ -572,6 +481,7 @@ def updateinfo():
         return render_template("staffD/Adminlog.html")
 
 
+# Student paper-1 marks updating function
 @app.route("/updateinfop1", methods=["GET", "POST"])
 def updateinfop1():
     if "user_id2" in session:
@@ -587,12 +497,12 @@ def updateinfop1():
             except AttributeError:
                 msg02 = "Student Not found"
                 return render_template("staffD/studinfoupdate.html", msg02=msg02)
-            paper_01 = request.form.get("p1")
+            paper_01 = request.form.get("p1").strip()
             try:
                 if paper_01[2] != "/":
                     msgp1er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
-                if int(paper_01[0:2]) > 80:
+                if int(paper_01[0:2]) > 80 or int(paper_01[3::]) > 80:
                     msgp1er = 'please enter  valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp1er=msgp1er)
             except IndexError:
@@ -618,23 +528,24 @@ def updateinfop1():
         return render_template("staffD/Adminlog.html")
 
 
+# Student paper-2 marks updating function
 @app.route("/updateinfop2", methods=["GET", "POST"])
 def updateinfop2():
     if "user_id2" in session:
         if request.method == "POST":
-            name = request.form.get("p2name")
+            name = request.form.get("p2name").strip()
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:
                 msg21 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg21=msg21)
-            paper_02 = request.form.get("p2")
+            paper_02 = request.form.get("p2").strip()
             try:
                 if paper_02[2] != "/":
                     msgp2er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
-                if int(paper_02[0:2]) > 80:
-                    msgp2er = 'please enter  valid marks'
+                if int(paper_02[0:2]) > 80 or int(paper_02[3::]) > 80:
+                    msgp2er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp2er=msgp2er)
             except IndexError:
                 msgp2er = 'Invalid response'
@@ -659,22 +570,23 @@ def updateinfop2():
         return render_template("staffD/Adminlog.html")
 
 
+# Student paper-2 marks updating function
 @app.route("/updateinfop3", methods=["GET", "POST"])
 def updateinfop3():
     if "user_id2" in session:
         if request.method == "POST":
-            name = request.form.get("p3name")
+            name = request.form.get("p3name").strip()
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:
                 msg31 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg31=msg31)
-            paper_03 = request.form.get("p3")
+            paper_03 = request.form.get("p3").strip()
             try:
                 if paper_03[2] != "/":
                     msgp3er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
-                if int(paper_03[0:2]) > 80:
+                if int(paper_03[0:2]) > 80 or int(paper_03[3::]) > 80:
                     msgp3er = 'please enter  valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp3er=msgp3er)
             except IndexError:
@@ -700,22 +612,23 @@ def updateinfop3():
         return render_template("staffD/Adminlog.html")
 
 
+# Student paper-4 marks updating function
 @app.route("/updateinfop4", methods=["GET", "POST"])
 def updateinfop4():
     if "user_id2" in session:
         if request.method == "POST":
-            name = request.form.get("p4name")
+            name = request.form.get("p4name").strip()
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:
                 msg41 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg41=msg41)
-            paper_04 = request.form.get("p4")
+            paper_04 = request.form.get("p4").strip()
             try:
                 if paper_04[2] != "/":
                     msgp4er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
-                if int(paper_04[0:2]) > 80:
+                if int(paper_04[0:2]) > 80 or int(paper_04[3::]) > 80:
                     msgp4er = 'please enter  valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp4er=msgp4er)
             except IndexError:
@@ -741,22 +654,23 @@ def updateinfop4():
         return render_template("staffD/Adminlog.html")
 
 
+# Student paper-5 marks updating function
 @app.route("/updateinfop5", methods=["GET", "POST"])
 def updateinfop5():
     if "user_id2" in session:
         if request.method == "POST":
-            name = request.form.get("p5name")
+            name = request.form.get("p5name").strip()
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=name).first())
             except AttributeError:
                 msg51 = "Student not found"
                 return render_template("staffD/studinfoupdate.html", msg51=msg51)
-            paper_05 = request.form.get("p5")
+            paper_05 = request.form.get("p5").strip()
             try:
                 if paper_05[2] != "/":
                     msgp5er = 'please enter valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
-                if int(paper_05[0:2]) > 80:
+                if int(paper_05[0:2]) > 80 or int(paper_05[3::]) > 80:
                     msgp5er = 'please enter  valid marks'
                     return render_template("staffD/studinfoupdate.html", msgp5er=msgp5er)
             except IndexError:
@@ -782,11 +696,12 @@ def updateinfop5():
         return render_template("staffD/Adminlog.html")
 
 
+# Student data removal from database
 @app.route('/studdelpg', methods=["GET", "POST"])
 def studdelpg():
     if "user_id2" in session:
         if request.method == "POST":
-            del_info = request.form.get("studnamed")
+            del_info = request.form.get("studnamed").strip()
             try:
                 check_data = Studinfo.js_re(Studinfo.query.filter_by(Name=del_info).first())
             except AttributeError:
@@ -795,7 +710,6 @@ def studdelpg():
             del_stu_in = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             db.session.delete(del_stu_in)
             db.session.commit()
-            stud_id_list = [Studinfo.js_st_id(a)['stud_if'] for a in Studinfo.query.all()]
             stud_name_list = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
             print(stud_name_list)
             j = 0
@@ -812,11 +726,12 @@ def studdelpg():
     return render_template("staffD/Adminlog.html")
 
 
+# Read function to view student data from database
 @app.route('/viewstud', methods=["GET", "POST"])
 def viewstud():
     if "user_id2" in session:
         if request.method == "POST":
-            stud_name_v = request.form.get("view")
+            stud_name_v = request.form.get("view").strip()
             name_check = re.findall(r'[0-9]+', stud_name_v)
             name_valid = []
             if name_valid != name_check:
@@ -854,13 +769,14 @@ def viewstud():
         return render_template("staffD/Adminlog.html")
 
 
+# Adding new staff user name and password
 @app.route("/staffidadd", methods=["GET", "POST"])
 def staffidadd():
     if "user_id2" in session:
         if request.method == "POST":
-            new_staff_name = request.form.get("sfid")
-            new_staff_email = request.form.get("sfemail")
-            new_staff_pass = request.form.get("pwds")
+            new_staff_name = request.form.get("sfid").strip()
+            new_staff_email = request.form.get("sfemail").strip()
+            new_staff_pass = request.form.get("pwds").strip()
             name_check = re.findall(r'[0-9]+', new_staff_name)
             name_check_list = []
             if name_check != name_check_list:
@@ -887,17 +803,18 @@ def staffidadd():
         return render_template("staffD/Adminlog.html")
 
 
+# Updating staff user name and password
 @app.route("/upstaffid", methods=["GET", "POST"])
 def upstaffid():
     if "user_id2" in session:
         if request.method == "POST":
-            staff_up_name = request.form.get("upstid")
+            staff_up_name = request.form.get("upstid").strip()
             try:
                 check_dta = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_up_name).first())
             except AttributeError:
                 return render_template("staffD/staff_and_student_info_update_add.html", upmsg="staff data not found")
-            update_email = request.form.get("stemail")
-            update_pass = request.form.get("pwds")
+            update_email = request.form.get("stemail").strip()
+            update_pass = request.form.get("pwds").strip()
             check_email_null_list = [a for a in update_email]
             check_pass_null_list = [a for a in update_pass]
             null_list = []
@@ -921,6 +838,7 @@ def upstaffid():
         return render_template("staffD/Adminlog.html")
 
 
+# Updating student login user name and email-id
 @app.route("/stuidadd", methods=["GET", "POST"])
 def stuidadd():
     if "user_id2" in session:
@@ -949,6 +867,7 @@ def stuidadd():
         return render_template("staffD/Adminlog.html")
 
 
+# Reading all student login info using jsonify
 @app.route('/showallstudlog', methods=['GET'])
 def allstudlog():
     if "user_id2" in session:
@@ -959,6 +878,7 @@ def allstudlog():
         return render_template("staffD/Adminlog.html")
 
 
+# Logout function using session
 @app.route('/adminlogout')
 def adminlogout():
     if "user_id2" in session:
