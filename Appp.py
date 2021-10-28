@@ -436,7 +436,8 @@ def admindashpg():
 def addstudinfoo():
     if "user_id2" in session:
         if request.method == 'POST':
-            stud_id_list = [Studinfo.js_st_id(a) for a in Studinfo.query.all()]
+            stud_id_list = [Studinfo.js_st_id(a)['stud_if'] for a in Studinfo.query.all()]
+            print(stud_id_list)
             new_stud_id = len(stud_id_list) + 1
             new_stud_name = request.form.get('studname').strip()
             name_check = re.findall(r'[0-9]+', new_stud_name)
@@ -794,6 +795,15 @@ def studdelpg():
             del_stu_in = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             db.session.delete(del_stu_in)
             db.session.commit()
+            stud_id_list = [Studinfo.js_st_id(a)['stud_if'] for a in Studinfo.query.all()]
+            stud_name_list = [Studinfo.js_name(a)["Name"] for a in Studinfo.query.all()]
+            print(stud_name_list)
+            j = 0
+            for i in stud_name_list:
+                j += 1
+                update_check_data = Studinfo.query.filter_by(Name=i).first()
+                update_check_data.stud_id = j
+                db.session.commit()
             msg_de = "Student data deleted"
             return render_template("staffD/admindelinfo.html", msg_de=msg_de)
         return render_template("staffD/admindelinfo.html")

@@ -7,6 +7,8 @@
   background-color:Tomato;
   text-align: center;
 }
+</style>
+<style>
 .button {
   background-color: #4CAF50; /* Green */
   border: none;
@@ -29,7 +31,7 @@
             {{ message }}
     {% endif %}
 {% endwith %}
-<h1> welcome to admin panel</h1>1
+<h1> welcome to admin panel</h1>
 <div class="myDiv">
     <h1  style="color:blue;"> Student related changes </h1>
     <form action="/addstudinfoo">
@@ -51,12 +53,12 @@
     <button type="submit">View Student data</button>
         <pre>Read</pre>
 </form>
-    <hr color="white">
+    <hr color="black">
     <h1  style="color:blue;"> shaff and student login related changes</h1>
     <form action="/staffidadd">
     <button class="button button1" type="submit">staff and student--> updation creation</button>
-        <pre>CURD operations</pre>
-        <hr color="white">
+        <pre>Create and update operations</pre>
+        <hr color="black">
 </form>
     <form action="/adminlogout">
     <button type="submit">logout</button>
