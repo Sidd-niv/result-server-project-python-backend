@@ -225,7 +225,11 @@ def otppg():
             otp_email = session['response']["email"]
             de_otp = rsa.decrypt(otp1, privatekey).decode()
             if de_otp == studOTp:
-                res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
+                try:
+                    res_email = Studinfo.js_re(Studinfo.query.filter_by(Name=otp_name).first())
+                except AttributeError:
+                    flash("Invalid UserName or Email-ID")
+                    return redirect(url_for('studloginpg'))
                 msg_li = [
                     f"Name: {res_email['Name']} |Roll No: {res_email['Roll_no']} |Div: {res_email['Div']} |Sem: {res_email['Sem_1']}",
                     f"Paper-1 Marks: {res_email['Paper_1']}",
@@ -531,7 +535,7 @@ def addstudinfoo():
                 if new_stud_p4[2] != "/":
                     msgp4 = 'please enter a valid input in paper-4'
                     return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
-                if int(new_stud_p4[0:2]) > 80 or int(new_stud_p1[3::]) > 80:
+                if int(new_stud_p4[0:2]) > 80 or int(new_stud_p4[3::]) > 80:
                     msgp4 = 'please enter valid marks for paper-4'
                     return render_template("staffD/Adminstudinfoadd.html", msgp4=msgp4)
             except IndexError:
@@ -542,7 +546,7 @@ def addstudinfoo():
                 if new_stud_p5[2] != "/":
                     msgp5 = 'please enter a valid input in paper-5'
                     return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
-                if int(new_stud_p5[0:2]) > 80 or int(new_stud_p1[3::]) > 80:
+                if int(new_stud_p5[0:2]) > 80 or int(new_stud_p5[3::]) > 80:
                     msgp5 = 'please enter valid marks'
                     return render_template("staffD/Adminstudinfoadd.html", msgp5=msgp5)
             except IndexError:
@@ -572,6 +576,11 @@ def addstudinfoo():
                              Paper_5=new_stud_p5, Overall_Percentage=new_stud_percen,
                              Stud_Result=new_stud_result)
             db.session.add(entry)
+            db.session.commit()
+            stud_lo_id = [Studloginfo.js_stud_user_name(a)["stud_name"] for a in Studloginfo.query.all()]
+            entry2 = Studloginfo(studId=len(stud_lo_id)+1, stud_name=new_stud_name2,
+                                 stud_email=f"xyz{len(stud_lo_id) + 2}@gamil.com")
+            db.session.add(entry2)
             db.session.commit()
             msgadd = "Student data added"
             return render_template("staffD/Adminstudinfoadd.html", msgadd=msgadd)
@@ -649,6 +658,10 @@ def updateinfop1():
             update_p1 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p1.Paper_1 = paper_01
             update_p1.Overall_Percentage = f"{new_stud_percen}%"
+            if int(new_stud_percen) >= 32:
+                update_p1.Stud_Result = "Pass"
+            else:
+                update_p1.Stud_Result = "Fail"
             db.session.commit()
             msg04 = "Paper-1 marks updated for previous student"
             return render_template("staffD/studinfoupdate.html", msg04=msg04)
@@ -691,6 +704,10 @@ def updateinfop2():
             update_p2 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p2.Paper_2 = paper_02
             update_p2.Overall_Percentage = f"{new_stud_percen}%"
+            if int(new_stud_percen) >= 32:
+                update_p2.Stud_Result = "Pass"
+            else:
+                update_p2.Stud_Result = "Fail"
             db.session.commit()
             msg23 = "Student Paper-2 marks updated!"
             return render_template("staffD/studinfoupdate.html", msg23=msg23)
@@ -733,6 +750,10 @@ def updateinfop3():
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_3 = paper_03
             update_p3.Overall_Percentage = f"{new_stud_percen}%"
+            if int(new_stud_percen) >= 32:
+                update_p3.Stud_Result = "Pass"
+            else:
+                update_p3.Stud_Result = "Fail"
             db.session.commit()
             msg33 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg33=msg33)
@@ -775,6 +796,10 @@ def updateinfop4():
             update_p3 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p3.Paper_4 = paper_04
             update_p3.Overall_Percentage = f"{new_stud_percen}%"
+            if int(new_stud_percen) >= 32:
+                update_p3.Stud_Result = "Pass"
+            else:
+                update_p3.Stud_Result = "Fail"
             db.session.commit()
             msg43 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg43=msg43)
@@ -817,6 +842,10 @@ def updateinfop5():
             update_p5 = Studinfo.query.filter_by(stud_id=check_data["stud_id"]).first()
             update_p5.Paper_5 = paper_05
             update_p5.Overall_Percentage = f"{new_stud_percen}%"
+            if int(new_stud_percen) >= 32:
+                update_p5.Stud_Result = "Pass"
+            else:
+                update_p5.Stud_Result = "Fail"
             db.session.commit()
             msg54 = "Previous student marks updated!!"
             return render_template("staffD/studinfoupdate.html", msg54=msg54)
