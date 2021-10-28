@@ -1,6 +1,6 @@
-import secrets
 import os
 import re
+import secrets
 import matplotlib
 from flask import Flask, render_template, request, session, flash, redirect, url_for, jsonify
 from flask_mail import Mail, Message
@@ -9,7 +9,7 @@ from random import randint
 from mail_pdff_den import *
 import matplotlib.pyplot as plt
 import rsa
-from config1 import *
+
 
 # use matplotlib.use to generate multiple graphs
 matplotlib.use('Agg')
