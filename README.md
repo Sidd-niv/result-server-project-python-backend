@@ -35,15 +35,17 @@ pip install matplotlib
 
 ## Phase-2
 *Task-1 was to build login-logout for staff/Teachers 
--Which is done by sessions 
+Which is done by sessions 
+
 *Task-2 was to generate graph to analyse each marks in each paper in percentage format.
--Graphs were generated using student data retrieved from database and with the help of matplotlib graphs were displayed on frontend 
+Graphs were generated using student data retrieved from database and with the help of matplotlib graphs were displayed on frontend 
 
 ## Phase-3
 *Task -1 was to build login and logout for admin
--Which is done by sessions 
+Which is done by sessions 
+
 *Task-2 was to give CURD to admin
--For both students and teacher login
+For both students and teacher login
 and student database
 
 
