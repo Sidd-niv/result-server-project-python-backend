@@ -8,9 +8,9 @@
     <form action="/viewstud" method="post">
         <label>Enter student name:
             <input type="text" name="view" required>
-        </label><br>{{msg1}}
+        </label><br>{{msg1}}<br>
         <button type="submit">View student data</button>
-    </form>
+    </form><br>
 </div>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
