@@ -45,7 +45,7 @@ Graphs were generated using student data retrieved from database and with the he
 Which is done by sessions 
 
 *Task-2 was to give CURD to admin
-For both students and teacher login
-and student database
+for both students and teacher login related changes
+and same for student database
 
 
