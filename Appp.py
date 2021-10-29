@@ -13,13 +13,14 @@ import rsa
 
 # use matplotlib.use to generate multiple graphs
 matplotlib.use('Agg')
+
 # creating public-private key for encryption and decryption
 publickey, privatekey = rsa.newkeys(512)
 
 # Initialization
 app = Flask(__name__)
 
-# Initializatiom
+# Initialization
 db = SQLAlchemy(app)
 
 # Configurations for application
