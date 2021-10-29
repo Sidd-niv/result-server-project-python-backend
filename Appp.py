@@ -480,7 +480,6 @@ def addstudinfoo():
     if "user_id2" in session:
         if request.method == 'POST':
             stud_id_list = [Studinfo.js_st_id(a)['stud_if'] for a in Studinfo.query.all()]
-            print(stud_id_list)
             new_stud_id = len(stud_id_list) + 1
             new_stud_name = request.form.get('studname').strip()
             name_check = re.findall(r'[0-9]+', new_stud_name)
