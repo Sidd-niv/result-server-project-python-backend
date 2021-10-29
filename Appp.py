@@ -278,8 +278,8 @@ def stafflogin():
     if "user_id" in session:
         session.pop("user_id", None)
     if request.method == 'POST':
-        staff_user_name = request.form.get("stafname")
-        staff_user_pass = request.form.get("pwds")
+        staff_user_name = request.form.get("stafname").strip()
+        staff_user_pass = request.form.get("pwds").strip()
         try:
             staff_info = Teacherlogin.js_log(Teacherlogin.query.filter_by(teacher_name=staff_user_name).first())
         except AttributeError:
